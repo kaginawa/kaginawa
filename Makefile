@@ -28,14 +28,10 @@ build: ## Build executable binaries for local execution
 
 .PHONY: build-all
 build-all: build ## Build executable binaries for all supported OSs and architectures
-	GO111MODULE=on GOOS=windows GOARCH=amd64 go build -o build/kaginawa.exe .
-	GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -o build/kaginawa.macos .
-	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -o build/kaginawa.linux-x64 .
-	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -o build/kaginawa.linux-arm .
-	#GO111MODULE=on GOOS=windows GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.exe .
-	#GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.macos .
-	#GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
-	#GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm .
+	GO111MODULE=on GOOS=windows GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.exe .
+	GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.macos .
+	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
+	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm .
 
 .PHONY: deploy
 deploy: build-all ## Release cross-compiled binary into snapshots directory of the S3.
