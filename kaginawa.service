@@ -1,0 +1,11 @@
+[Unit]
+Description=kaginawa
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/kaginawa -f /etc/kaginawa.json
+Restart=always
+User=root
+
+[Install]
+WantedBy=multi-user.target
