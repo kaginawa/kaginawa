@@ -102,7 +102,13 @@ func genReport() report {
 	// Payload
 	if len(config.PayloadCommand) > 0 {
 		report.PayloadCmd = config.PayloadCommand
-		output, err := exec.Command(config.PayloadCommand).Output()
+		param := strings.Split(config.PayloadCommand, " ")
+		name := param[0]
+		args := make([]string, 0)
+		if len(param) > 1 {
+			args = param[1:]
+		}
+		output, err := exec.Command(name, args...).Output()
 		if err != nil {
 			report.Errors = append(report.Errors, fmt.Sprintf("failed to execute payload command: %v", err))
 		}
