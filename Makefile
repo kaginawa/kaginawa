@@ -1,5 +1,4 @@
 .DEFAULT_GOAL := help
-DEPLOY_BUCKET := "xxx"
 
 .PHONY: setup
 setup: ## Resolve dependencies using Go Modules
@@ -35,14 +34,11 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 
 .PHONY: deploy
 deploy: build-all ## Release cross-compiled binary into snapshots directory of the S3.
-	tar czvf build/kaginawa.exe.tar.gz -C build kaginawa.exe
-	tar czvf build/kaginawa.macos.tar.gz -C build kaginawa.macos
-	tar czvf build/kaginawa.linux-x64.tar.gz -C build kaginawa.linux-x64
-	tar czvf build/kaginawa.linux-arm.tar.gz -C build kaginawa.linux-arm
-	aws s3 cp build/kaginawa.exe.tar.gz s3://$(DEPLOY_BUCKET)/snapshots/kaginawa_`git describe --tags`.exe.tar.gz
-	aws s3 cp build/kaginawa.macos.tar.gz s3://$(DEPLOY_BUCKET)/snapshots/kaginawa_`git describe --tags`.macos.tar.gz
-	aws s3 cp build/kaginawa.linux-x64.tar.gz s3://$(DEPLOY_BUCKET)/snapshots/kaginawa_`git describe --tags`.linux-x64.tar.gz
-	aws s3 cp build/kaginawa.linux-arm.tar.gz s3://$(DEPLOY_BUCKET)/snapshots/kaginawa_`git describe --tags`.linux-arm.tar.gz
+	tar czf build/kaginawa_`git describe --tags`.exe.tar.gz -C build kaginawa.exe
+	tar czf build/kaginawa_`git describe --tags`.macos.tar.gz -C build kaginawa.macos
+	tar czf build/kaginawa_`git describe --tags`.linux-x64.tar.gz -C build kaginawa.linux-x64
+	tar czf build/kaginawa_`git describe --tags`.linux-arm.tar.gz -C build kaginawa.linux-arm
+	# TODO: Upload to an object storage
 
 .PHONY: count
 count-go: ## Count number of lines of all go codes

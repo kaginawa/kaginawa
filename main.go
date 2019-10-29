@@ -11,7 +11,7 @@ import (
 const defaultConfigFilePath = "kaginawa.json"
 
 var (
-	ver            = "0.0.0"
+	ver            = "v0.0.0"
 	configPath     = flag.String("c", defaultConfigFilePath, "path to configuration file")
 	bootTime       time.Time
 	macAddr        string
@@ -36,7 +36,7 @@ func main() {
 	if err := initID(); err != nil {
 		log.Fatal(err)
 	}
-	log.Printf("Kaginawa v%s on %s", ver, macAddr)
+	log.Printf("Kaginawa %s on %s", ver, macAddr)
 
 	// Main loop
 	doReport()
