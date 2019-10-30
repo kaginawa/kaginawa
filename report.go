@@ -58,7 +58,6 @@ func doReport() {
 	if err != nil {
 		log.Fatalf("failed to marshal report: %v", err)
 	}
-	log.Print(string(data))
 	if strings.Contains(config.Server, "localhost") {
 		if err := uploadReport(data, "http"); err != nil {
 			log.Printf("failed to upload report: %v", err)
