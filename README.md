@@ -8,7 +8,7 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 ![](docs/overview.png)
 
 - SSH tunneling to pass through NATs and firewalls
-- Automatic bind port assignment and notification
+- Automatic port assignment and reporting
 - Physical MAC address based device identification
 - Basic metrics collection and alive monitoring
 - Scalable and fault tolerant design
@@ -44,6 +44,9 @@ All parameters and default values:
 | ssh_local_host      | string | localhost | SSH host on your local machine        |
 | ssh_local_port      | int    | 22        | SSH port on your local machine        |
 | ssh_retry_gap_sec   | int    | 10        | Retry gap of SSH connection (seconds) |
+| ping_enabled        | bool   | false     | Enable / disable ping latency measure |
+| ping_primary        | string | 1.1.1.1   | Primary ping target                   |
+| ping_secondary      | string | 1.0.0.1   | Secondary ping target                 |
 | payload_command     | string |           | Payload (additional data) command     |
 
 Sample configuration for payload uploading:

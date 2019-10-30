@@ -33,6 +33,8 @@ type report struct {
 	LocalIPv4      string   `json:"ip4_local,omitempty"`        // Local IPv6 address
 	LocalIPv6      string   `json:"ip6_local,omitempty"`        // Local IPv6 address
 	Hostname       string   `json:"hostname,omitempty"`         // OS Hostname
+	PingMills      float64  `json:"ping_ms,omitempty"`          // Ping latency milliseconds
+	PingTarget     string   `json:"ping_target.omitempty"`      // Ping target for result
 	Errors         []string `json:"errors,omitempty"`           // List of errors
 	Payload        string   `json:"payload,omitempty"`          // Custom content provided by payload command
 	PayloadCmd     string   `json:"payload_cmd,omitempty"`      // Executed payload command
@@ -56,6 +58,7 @@ func doReport() {
 	if err != nil {
 		log.Fatalf("failed to marshal report: %v", err)
 	}
+	log.Print(string(data))
 	if strings.Contains(config.Server, "localhost") {
 		if err := uploadReport(data, "http"); err != nil {
 			log.Printf("failed to upload report: %v", err)
@@ -98,6 +101,25 @@ func genReport() report {
 		report.Errors = append(report.Errors, fmt.Sprintf("failed to collect hostname: %v", err))
 	}
 	report.Hostname = hostname
+
+	// Ping latency
+	if config.PingEnabled {
+		if l, err := pingLatency(config.PrimaryPingTarget); err != nil {
+			if len(config.SecondaryPingTarget) > 0 {
+				if l, err := pingLatency(config.SecondaryPingTarget); err != nil {
+					report.Errors = append(report.Errors, fmt.Sprintf("failed to measure ping: %v", err))
+				} else {
+					report.PingMills = l
+					report.PingTarget = config.SecondaryPingTarget
+				}
+			} else {
+				report.Errors = append(report.Errors, fmt.Sprintf("failed to measure ping: %v", err))
+			}
+		} else {
+			report.PingMills = l
+			report.PingTarget = config.PrimaryPingTarget
+		}
+	}
 
 	// Payload
 	if len(config.PayloadCommand) > 0 {
