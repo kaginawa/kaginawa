@@ -19,6 +19,44 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 - [Kaginawa server](https://github.com/mikan/kaginawa-server) (data collection)
 - SSH Server (ssh sockets)
 
+## Configuration
+
+Default configuration file name is `kaginawa.json`.
+
+Minimum configuration:
+
+```json
+{
+  "api_key": "xxx",
+  "server": "xxx.herokuapp.com"
+}
+```
+
+All parameters and default values:
+
+| Parameter           | Type   | Default   | Description                           |
+| ------------------- | ------ | --------- | ------------------------------------- |
+| api_key             | string |           | API key issued by Kaginawa Server     |
+| server              | string |           | Address of Kanigawa Server            |
+| custom_id           | string |           | User-specified id for your machine    |
+| report_interval_min | int    | 3         | Report upload interval (minutes)      |
+| ssh_enabled         | bool   | true      | Enable / disable SSH tunneling        |
+| ssh_local_host      | string | localhost | SSH host on your local machine        |
+| ssh_local_port      | int    | 22        | SSH port on your local machine        |
+| ssh_retry_gap_sec   | int    | 10        | Retry gap of SSH connection (seconds) |
+| payload_command     | string |           | Payload (additional data) command     |
+
+Sample configuration for payload uploading:
+
+```json
+{
+  "api_key": "xxx",
+  "server": "xxx.herokuapp.com",
+  "ssh_enabled": false,
+  "payload_command": "curl https://api.ipify.org?format=json"
+}
+```
+
 ## Development
 
 ### Prerequisites
