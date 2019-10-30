@@ -34,7 +34,7 @@ type report struct {
 	LocalIPv6      string   `json:"ip6_local,omitempty"`        // Local IPv6 address
 	Hostname       string   `json:"hostname,omitempty"`         // OS Hostname
 	PingMills      float64  `json:"ping_ms,omitempty"`          // Ping latency milliseconds
-	PingTarget     string   `json:"ping_target.omitempty"`      // Ping target for result
+	PingTarget     string   `json:"ping_target,omitempty"`      // Ping target for result
 	Errors         []string `json:"errors,omitempty"`           // List of errors
 	Payload        string   `json:"payload,omitempty"`          // Custom content provided by payload command
 	PayloadCmd     string   `json:"payload_cmd,omitempty"`      // Executed payload command

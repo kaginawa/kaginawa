@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"net"
 	"os"
 	"sort"
@@ -31,7 +30,6 @@ func pingLatency(target string) (float64, error) {
 		}
 		results[i] = elapsed
 	}
-	log.Printf("ping results: %v", results)
 	sort.Float64s(results)
 	return results[1], nil // pick median
 }
