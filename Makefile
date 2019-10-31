@@ -31,14 +31,11 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 	GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.macos .
 	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
 	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm .
-
-.PHONY: deploy
-deploy: build-all ## Release cross-compiled binary into snapshots directory of the S3.
-	tar czf build/kaginawa_`git describe --tags`.exe.tar.gz -C build kaginawa.exe
-	tar czf build/kaginawa_`git describe --tags`.macos.tar.gz -C build kaginawa.macos
-	tar czf build/kaginawa_`git describe --tags`.linux-x64.tar.gz -C build kaginawa.linux-x64
-	tar czf build/kaginawa_`git describe --tags`.linux-arm.tar.gz -C build kaginawa.linux-arm
-	# TODO: Upload to an object storage
+	zip -jmq9 build/kaginawa.exe.zip build/kaginawa.exe
+	bzip2 -f build/kaginawa.macos
+	bzip2 -f build/kaginawa.linux-x64
+	bzip2 -f build/kaginawa.linux-arm
+	git describe --tags
 
 .PHONY: count
 count-go: ## Count number of lines of all go codes
