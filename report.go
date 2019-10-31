@@ -167,7 +167,7 @@ func uploadReport(report []byte, proto string) error {
 	defer safeClose(resp.Body, "report body")
 	var serverMessage reply
 	if err := json.Unmarshal(body, &serverMessage); err != nil {
-		return fmt.Errorf("failed to unmarshal reponse: %w", err)
+		return fmt.Errorf("failed to unmarshal response: %w", err)
 	}
 
 	// Reboot if server is requested
