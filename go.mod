@@ -1,4 +1,4 @@
-module github.com/mikan/kaginawa
+module github.com/kaginawa/kaginawa
 
 go 1.13
 

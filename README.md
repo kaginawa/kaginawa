@@ -16,7 +16,7 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 
 ## System Requirements
 
-- [Kaginawa server](https://github.com/mikan/kaginawa-server) (data collection)
+- [Kaginawa server](https://github.com/kaginawa/kaginawa-server) (data collection)
 - SSH Server (ssh sockets)
 
 ## Configuration
