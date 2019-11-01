@@ -47,9 +47,6 @@ All parameters and default values:
 | ssh_local_host      | string | localhost | SSH host on your local machine        |
 | ssh_local_port      | int    | 22        | SSH port on your local machine        |
 | ssh_retry_gap_sec   | int    | 10        | Retry gap of SSH connection (seconds) |
-| ping_enabled        | bool   | false     | Enable / disable ping latency measure |
-| ping_primary        | string | 1.1.1.1   | Primary ping target                   |
-| ping_secondary      | string | 1.0.0.1   | Secondary ping target                 |
 | payload_command     | string |           | Payload (additional data) command     |
 
 Sample configuration for payload uploading:
@@ -72,7 +69,13 @@ Sample configuration for payload uploading:
 
 ## Operation
 
-### SSH User Setup
+### systemd
+
+Sample unit file is available at [kaginawa.service](kaginawa.service).
+
+### SSH Server
+
+#### User Setup
 
 ```
 $ sudo useradd -m -s /bin/false kaginawa
@@ -88,6 +91,10 @@ $ cat remote
 
 NOTE: A login shell is not required for tunneling connections.
 Use `/bin/false` to reduce the risk of server hijacking.
+
+## License
+
+Kaginawa licensed under the [BSD 3-clause license](LICENSE).
 
 ## Author
 
