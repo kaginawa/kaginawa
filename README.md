@@ -47,6 +47,9 @@ All parameters and default values:
 | ssh_local_host      | string | localhost | SSH host on your local machine        |
 | ssh_local_port      | int    | 22        | SSH port on your local machine        |
 | ssh_retry_gap_sec   | int    | 10        | Retry gap of SSH connection (seconds) |
+| rtt_enabled         | bool   | true      | Measure round trip time               |
+| throughput_enabled  | bool   | false     | Measure network throughput            |
+| throughput_kb       | int    | 500       | Data size of throughput measurement   |
 | payload_command     | string |           | Payload (additional data) command     |
 
 Sample configuration for payload uploading:

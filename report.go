@@ -11,6 +11,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -33,8 +34,9 @@ type report struct {
 	LocalIPv4      string   `json:"ip4_local,omitempty"`        // Local IPv6 address
 	LocalIPv6      string   `json:"ip6_local,omitempty"`        // Local IPv6 address
 	Hostname       string   `json:"hostname,omitempty"`         // OS Hostname
-	PingMills      float64  `json:"ping_ms,omitempty"`          // Ping latency milliseconds
-	PingTarget     string   `json:"ping_target,omitempty"`      // Ping target for result
+	RTTMills       int64    `json:"rtt_ms,omitempty"`           // Round trip time milliseconds
+	UploadKBPS     int64    `json:"upload_bps,omitempty"`       // Upload throughput bps
+	DownloadKBPS   int64    `json:"download_bps,omitempty"`     // Download throughput bps
 	Errors         []string `json:"errors,omitempty"`           // List of errors
 	Payload        string   `json:"payload,omitempty"`          // Custom content provided by payload command
 	PayloadCmd     string   `json:"payload_cmd,omitempty"`      // Executed payload command
@@ -101,6 +103,25 @@ func genReport() report {
 	}
 	report.Hostname = hostname
 
+	// Measurements
+	if config.RTTEnabled {
+		rtt, err := measureRoundTripTimeMills()
+		if err != nil {
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to measure rtt: %v", err))
+		} else {
+			report.RTTMills = rtt
+		}
+	}
+	if config.ThroughputEnabled && config.ThroughputKB >= 0 {
+		downKBPS, upKBPS, err := measureThroughput(config.ThroughputKB)
+		if err != nil {
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to measure throughput: %v", err))
+		} else {
+			report.DownloadKBPS = downKBPS
+			report.UploadKBPS = upKBPS
+		}
+	}
+
 	// Payload
 	if len(config.PayloadCommand) > 0 {
 		report.PayloadCmd = config.PayloadCommand
@@ -165,6 +186,54 @@ func uploadReport(report []byte, proto string) error {
 		sshLoopStarted.Do(func() { go listenSSH() })
 	}
 	return nil
+}
+
+func measureRoundTripTimeMills() (int64, error) {
+	begin := time.Now()
+	resp, err := http.Get("http://" + config.Server + "/measure/10240") // Use http to reduce overhead
+	if err != nil {
+		return -1, err
+	}
+	defer safeClose(resp.Body, "measure body")
+	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+		return -1, err
+	}
+	elapsed := time.Since(begin).Milliseconds()
+	if resp.StatusCode != http.StatusOK {
+		return -1, fmt.Errorf("HTTP %d", resp.StatusCode)
+	}
+	return elapsed, nil
+}
+
+func measureThroughput(kb int) (int64, int64, error) {
+	downloadBegin := time.Now()
+	dr, err := http.Get("http://" + config.Server + "/measure/" + strconv.Itoa(kb)) // Use http to reduce overhead
+	if err != nil {
+		return -1, -1, err
+	}
+	defer safeClose(dr.Body, "measure body")
+	if _, err := ioutil.ReadAll(dr.Body); err != nil {
+		return -1, -1, err
+	}
+	downloadSec := time.Since(downloadBegin).Seconds()
+	if dr.StatusCode != http.StatusOK {
+		return -1, -1, fmt.Errorf("HTTP %d", dr.StatusCode)
+	}
+	body := bytes.NewBuffer(make([]byte, kb*1024))
+	uploadBegin := time.Now()
+	ur, err := http.Post("http://"+config.Server+"/measure/"+strconv.Itoa(kb), "application/octet-stream", body)
+	if err != nil {
+		return -1, -1, err
+	}
+	defer safeClose(ur.Body, "measure body")
+	if _, err := ioutil.ReadAll(ur.Body); err != nil {
+		return -1, -1, err
+	}
+	uploadSec := time.Since(uploadBegin).Seconds()
+	if ur.StatusCode != http.StatusOK {
+		return -1, -1, fmt.Errorf("HTTP %d", ur.StatusCode)
+	}
+	return int64(float64(kb*8) / downloadSec), int64(float64(kb*8) / uploadSec), nil
 }
 
 func trimSubnetMusk(addr net.Addr) string {
