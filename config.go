@@ -19,6 +19,9 @@ type Config struct {
 	SSHLocalHost      string `json:"ssh_local_host"`
 	SSHLocalPort      int    `json:"ssh_local_port"`
 	SSHRetryGapSec    int    `json:"ssh_retry_gap_sec"`
+	RTTEnabled        bool   `json:"rtt_enabled"`
+	ThroughputEnabled bool   `json:"throughput_enabled"`
+	ThroughputKB      int    `json:"throughput_kb"`
 }
 
 var config = Config{
@@ -26,6 +29,8 @@ var config = Config{
 	SSHLocalHost:      "localhost",
 	SSHLocalPort:      22,
 	SSHRetryGapSec:    10,
+	RTTEnabled:        true,
+	ThroughputKB:      500,
 }
 
 // loadConfig loads configuration file from default or specified path.
