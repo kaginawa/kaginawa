@@ -101,25 +101,6 @@ func genReport() report {
 	}
 	report.Hostname = hostname
 
-	// Ping latency
-	if config.PingEnabled {
-		if l, err := pingLatency(config.PrimaryPingTarget); err != nil {
-			if len(config.SecondaryPingTarget) > 0 {
-				if l, err := pingLatency(config.SecondaryPingTarget); err != nil {
-					report.Errors = append(report.Errors, fmt.Sprintf("failed to measure ping: %v", err))
-				} else {
-					report.PingMills = l
-					report.PingTarget = config.SecondaryPingTarget
-				}
-			} else {
-				report.Errors = append(report.Errors, fmt.Sprintf("failed to measure ping: %v", err))
-			}
-		} else {
-			report.PingMills = l
-			report.PingTarget = config.PrimaryPingTarget
-		}
-	}
-
 	// Payload
 	if len(config.PayloadCommand) > 0 {
 		report.PayloadCmd = config.PayloadCommand

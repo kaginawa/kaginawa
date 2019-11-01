@@ -10,27 +10,22 @@ import (
 
 // Config defines all of configuration parameters.
 type Config struct {
-	APIKey              string `json:"api_key"`
-	CustomID            string `json:"custom_id"`
-	Server              string `json:"server"`
-	ReportIntervalMin   int    `json:"report_interval_min"`
-	PayloadCommand      string `json:"payload_command"`
-	SSHEnabled          bool   `json:"ssh_enabled"`
-	SSHLocalHost        string `json:"ssh_local_host"`
-	SSHLocalPort        int    `json:"ssh_local_port"`
-	SSHRetryGapSec      int    `json:"ssh_retry_gap_sec"`
-	PingEnabled         bool   `json:"ping_enabled"`
-	PrimaryPingTarget   string `json:"ping_primary"`
-	SecondaryPingTarget string `json:"ping_secondary"`
+	APIKey            string `json:"api_key"`
+	CustomID          string `json:"custom_id"`
+	Server            string `json:"server"`
+	ReportIntervalMin int    `json:"report_interval_min"`
+	PayloadCommand    string `json:"payload_command"`
+	SSHEnabled        bool   `json:"ssh_enabled"`
+	SSHLocalHost      string `json:"ssh_local_host"`
+	SSHLocalPort      int    `json:"ssh_local_port"`
+	SSHRetryGapSec    int    `json:"ssh_retry_gap_sec"`
 }
 
 var config = Config{
-	ReportIntervalMin:   3,
-	SSHLocalHost:        "localhost",
-	SSHLocalPort:        22,
-	SSHRetryGapSec:      10,
-	PrimaryPingTarget:   "1.1.1.1",
-	SecondaryPingTarget: "1.0.0.1",
+	ReportIntervalMin: 3,
+	SSHLocalHost:      "localhost",
+	SSHLocalPort:      22,
+	SSHRetryGapSec:    10,
 }
 
 // loadConfig loads configuration file from default or specified path.
