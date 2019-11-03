@@ -2,8 +2,10 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io"
 	"log"
+	"runtime"
 	"sync"
 	"time"
 )
@@ -13,6 +15,7 @@ const defaultConfigFilePath = "kaginawa.json"
 var (
 	ver            = "v0.0.0"
 	configPath     = flag.String("c", defaultConfigFilePath, "path to configuration file")
+	versionPrint   = flag.Bool("v", false, "print version and exit")
 	bootTime       time.Time
 	macAddr        string
 	adapterName    string
@@ -27,6 +30,12 @@ func main() {
 	bootTime = time.Now().UTC()
 	flag.Parse()
 
+	// Print version
+	if *versionPrint {
+		fmt.Printf("kaginawa %s, compiled by %s\n", ver, runtime.Version())
+		return
+	}
+
 	// Load configuration
 	if err := loadConfig(*configPath); err != nil {
 		log.Fatal(err)
@@ -37,6 +46,11 @@ func main() {
 		log.Fatal(err)
 	}
 	log.Printf("Kaginawa %s on %s", ver, macAddr)
+
+	// Update checker
+	if config.UpdateEnabled {
+		go updateChecker()
+	}
 
 	// Main loop
 	doReport()

@@ -51,6 +51,9 @@ All parameters and default values:
 | throughput_enabled  | bool   | false     | Measure network throughput            |
 | throughput_kb       | int    | 500       | Data size of throughput measurement   |
 | payload_command     | string |           | Payload (additional data) command     |
+| update_enabled      | bool   | true      | Enable / disable automatic update     |
+| update_check_url    | string | (github)  | Latest version information URL        |
+| update_command      | string | (os deps) | Service restart command               |
 
 Sample configuration for payload uploading:
 
@@ -94,6 +97,16 @@ $ cat remote
 
 NOTE: A login shell is not required for tunneling connections.
 Use `/bin/false` to reduce the risk of server hijacking.
+
+### Automatic Update
+
+Default values of `update_command` configuration parameter:
+
+| OS      | Default value                   |
+| ------- | ------------------------------- |
+| Linux   | `sudo service restart kaginawa` |
+| MacOS   | (empty)                         |
+| Windows | (empty)                         |
 
 ## License
 
