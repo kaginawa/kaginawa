@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 )
 
 // Config defines all of configuration parameters.
@@ -22,6 +23,9 @@ type Config struct {
 	RTTEnabled        bool   `json:"rtt_enabled"`
 	ThroughputEnabled bool   `json:"throughput_enabled"`
 	ThroughputKB      int    `json:"throughput_kb"`
+	UpdateEnabled     bool   `json:"update_enabled"`
+	UpdateCheckURL    string `json:"update_check_url"`
+	UpdateCommand     string `json:"update_command"`
 }
 
 var config = Config{
@@ -31,6 +35,8 @@ var config = Config{
 	SSHRetryGapSec:    10,
 	RTTEnabled:        true,
 	ThroughputKB:      500,
+	UpdateEnabled:     true,
+	UpdateCheckURL:    "https://kaginawa.github.io/LATEST",
 }
 
 // loadConfig loads configuration file from default or specified path.
@@ -46,6 +52,11 @@ func loadConfig(path string) error {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("failed to load %s: %w", path, err)
+	}
+
+	// Set OS-specific default value
+	if runtime.GOOS == "linux" {
+		config.UpdateCommand = "sudo service restart kaginawa"
 	}
 
 	// Parse file
