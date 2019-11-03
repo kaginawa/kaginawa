@@ -35,7 +35,7 @@ func checkAndUpdate() (finished bool) {
 			log.Printf("failed to download version %s: %v", newVer, err)
 		} else {
 			if err := replace(tempFileName); err != nil {
-
+				log.Printf("download complete. please restart process manually.")
 			} else {
 				if len(config.UpdateCommand) > 0 {
 					log.Print("download complete. now executing restart...")
@@ -133,26 +133,19 @@ func download() (string, error) {
 }
 
 func replace(tempFileName string) error {
-	if runtime.GOOS == "windows" {
-		// tmp -> kaginawa.new
-		if err := os.Rename(tempFileName, os.Args[0]+".new"); err != nil {
-			return fmt.Errorf("failed to move file: %v", err)
-		}
-		log.Printf("downloaded " + os.Args[0] + ".new")
-		log.Print("Please rename to actual file name after program stop manually.")
-	} else {
-		// kaginawa -> kaginawa.old
-		if err := os.Rename(os.Args[0], os.Args[0]+".old"); err != nil {
-			return fmt.Errorf("failed to move file: %v", err)
-		}
-		log.Printf("current binary has been moved to " + os.Args[0] + ".old")
+	// kaginawa -> kaginawa.old
+	if err := os.Rename(os.Args[0], os.Args[0]+".old"); err != nil {
+		return fmt.Errorf("failed to move file: %v", err)
+	}
+	log.Printf("current binary has been moved to " + os.Args[0] + ".old")
 
-		// tmp -> kaginawa
-		if err := os.Rename(tempFileName, os.Args[0]); err != nil {
-			return fmt.Errorf("failed to move file: %v", err)
-		}
+	// tmp -> kaginawa
+	if err := os.Rename(tempFileName, os.Args[0]); err != nil {
+		return fmt.Errorf("failed to move file: %v", err)
+	}
 
-		// make executable
+	// make executable
+	if runtime.GOOS != "windows" {
 		if err := os.Chmod(os.Args[0], 0775); err != nil {
 			log.Printf("failed to chmod: %s", os.Args[0])
 		}
