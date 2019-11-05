@@ -53,9 +53,9 @@ func main() {
 	}
 
 	// Main loop
-	doReport()
+	doReport(0)
 	for range time.Tick(time.Duration(config.ReportIntervalMin) * time.Minute) {
-		doReport()
+		doReport(config.ReportIntervalMin)
 	}
 }
 
