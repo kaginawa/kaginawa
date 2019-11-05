@@ -19,6 +19,7 @@ import (
 // report defines all of report attributes
 type report struct {
 	ID             string   `json:"id"`                         // MAC address of the primary network interface
+	Trigger        int      `json:"trigger"`                    // Report trigger (-1: connected, 0: boot, n: interval)
 	Runtime        string   `json:"runtime"`                    // OS and arch
 	Success        bool     `json:"success"`                    // Equals len(Errors) == 0
 	Sequence       int      `json:"seq"`                        // Report sequence number, resets by reboot or restart
@@ -55,8 +56,8 @@ type reply struct {
 var seq = 0
 
 // doReport generates and uploads a record.
-func doReport() {
-	data, err := json.MarshalIndent(genReport(), "", "  ")
+func doReport(trigger int) {
+	data, err := json.MarshalIndent(genReport(trigger), "", "  ")
 	if err != nil {
 		log.Fatalf("failed to marshal report: %v", err)
 	}
@@ -78,11 +79,12 @@ func doReport() {
 }
 
 // genReport generates a report.
-func genReport() report {
+func genReport(trigger int) report {
 	seq++
 	timeBegin := time.Now()
 	report := report{
 		ID:             macAddr,
+		Trigger:        trigger,
 		CustomID:       config.CustomID,
 		BootTime:       bootTime.Unix(),
 		SSHServerHost:  msg.SSHServerHost,

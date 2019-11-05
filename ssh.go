@@ -61,7 +61,7 @@ func openTunnel() error {
 	sshRemotePort = port(listener.Addr())
 	sshConnectTime = time.Now().UTC()
 	log.Printf("ssh listener open: %s", listener.Addr().String())
-	go doReport()
+	go doReport(-1)
 
 	// Open a local socket
 	for {
