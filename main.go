@@ -16,6 +16,7 @@ var (
 	ver            = "v0.0.0"
 	configPath     = flag.String("c", defaultConfigFilePath, "path to configuration file")
 	versionPrint   = flag.Bool("v", false, "print version and exit")
+	debugPrint     = flag.Bool("d", false, "log report content")
 	bootTime       time.Time
 	macAddr        string
 	adapterName    string

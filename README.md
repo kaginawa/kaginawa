@@ -37,23 +37,25 @@ Minimum configuration:
 
 All parameters and default values:
 
-| Parameter           | Type   | Default   | Description                           |
-| ------------------- | ------ | --------- | ------------------------------------- |
-| api_key             | string |           | API key issued by Kaginawa Server     |
-| server              | string |           | Address of Kanigawa Server            |
-| custom_id           | string |           | User-specified id for your machine    |
-| report_interval_min | int    | 3         | Report upload interval (minutes)      |
-| ssh_enabled         | bool   | true      | Enable / disable SSH tunneling        |
-| ssh_local_host      | string | localhost | SSH host on your local machine        |
-| ssh_local_port      | int    | 22        | SSH port on your local machine        |
-| ssh_retry_gap_sec   | int    | 10        | Retry gap of SSH connection (seconds) |
-| rtt_enabled         | bool   | true      | Measure round trip time               |
-| throughput_enabled  | bool   | false     | Measure network throughput            |
-| throughput_kb       | int    | 500       | Data size of throughput measurement   |
-| payload_command     | string |           | Payload (additional data) command     |
-| update_enabled      | bool   | true      | Enable / disable automatic update     |
-| update_check_url    | string | (github)  | Latest version information URL        |
-| update_command      | string | (os deps) | Service restart command               |
+| Parameter              | Type   | Default   | Description                           |
+| ---------------------- | ------ | --------- | ------------------------------------- |
+| api_key                | string |           | API key issued by Kaginawa Server     |
+| server                 | string |           | Address of Kanigawa Server            |
+| custom_id              | string |           | User-specified id for your machine    |
+| report_interval_min    | int    | 3         | Report upload interval (minutes)      |
+| ssh_enabled            | bool   | true      | Enable / disable SSH tunneling        |
+| ssh_local_host         | string | localhost | SSH host on your local machine        |
+| ssh_local_port         | int    | 22        | SSH port on your local machine        |
+| ssh_retry_gap_sec      | int    | 10        | Retry gap of SSH connection (seconds) |
+| rtt_enabled            | bool   | true      | Measure round trip time               |
+| throughput_enabled     | bool   | false     | Measure network throughput            |
+| throughput_kb          | int    | 500       | Data size of throughput measurement   |
+| disk_usage_enabled     | bool   | (os deps) | Obtain disk usage                     |
+| disk_usage_mount_point | string | /         | Disk usage for mount point            |
+| payload_command        | string |           | Payload (additional data) command     |
+| update_enabled         | bool   | true      | Enable / disable automatic update     |
+| update_check_url       | string | (github)  | Latest version information URL        |
+| update_command         | string | (os deps) | Service restart command               |
 
 Sample configuration for payload uploading:
 
