@@ -89,7 +89,7 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		}
 		return nil, fmt.Errorf("no storage profile: %s", string(raw))
 	case "linux":
-		raw, err := exec.Command("df", "-T", mountPoint).Output()
+		raw, err := exec.Command("df", "-T", "-B", "1", mountPoint).Output()
 		if err != nil {
 			return nil, err
 		}
@@ -100,8 +100,10 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		var s scanner.Scanner
 		s.Init(strings.NewReader(lines[1]))
 		tokens := make([]string, 0)
-		for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
-			tokens = append(tokens, s.TokenText())
+		for _, tok := range strings.Split(lines[1], " ") {
+			if len(tok) > 0 {
+				tokens = append(tokens, tok)
+			}
 		}
 		if len(tokens) < 7 {
 			return nil, fmt.Errorf("invalid record: %s", lines[1])
