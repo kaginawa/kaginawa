@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
+	"text/scanner"
 )
 
 type diskUsageReport struct {
@@ -96,7 +97,12 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		if len(lines) < 2 {
 			return nil, fmt.Errorf("no record: %s", string(raw))
 		}
-		tokens := strings.Split(lines[1], " ")
+		var s scanner.Scanner
+		s.Init(strings.NewReader(lines[1]))
+		tokens := make([]string, 0)
+		for tok := s.Scan(); tok != scanner.EOF; tok = s.Scan() {
+			tokens = append(tokens, s.TokenText())
+		}
 		if len(tokens) < 7 {
 			return nil, fmt.Errorf("invalid record: %s", lines[1])
 		}
