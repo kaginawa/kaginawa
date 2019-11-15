@@ -19,7 +19,7 @@ lint: ## Runs static code analysis
 
 .PHONY: run
 run: ## Run agent without build artifact generation
-	GO111MODULE=on go run .
+	GO111MODULE=on go run . -d
 
 .PHONY: build
 build: ## Build executable binaries for local execution

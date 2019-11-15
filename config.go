@@ -11,32 +11,35 @@ import (
 
 // Config defines all of configuration parameters.
 type Config struct {
-	APIKey            string `json:"api_key"`
-	CustomID          string `json:"custom_id"`
-	Server            string `json:"server"`
-	ReportIntervalMin int    `json:"report_interval_min"`
-	PayloadCommand    string `json:"payload_command"`
-	SSHEnabled        bool   `json:"ssh_enabled"`
-	SSHLocalHost      string `json:"ssh_local_host"`
-	SSHLocalPort      int    `json:"ssh_local_port"`
-	SSHRetryGapSec    int    `json:"ssh_retry_gap_sec"`
-	RTTEnabled        bool   `json:"rtt_enabled"`
-	ThroughputEnabled bool   `json:"throughput_enabled"`
-	ThroughputKB      int    `json:"throughput_kb"`
-	UpdateEnabled     bool   `json:"update_enabled"`
-	UpdateCheckURL    string `json:"update_check_url"`
-	UpdateCommand     string `json:"update_command"`
+	APIKey              string `json:"api_key"`
+	CustomID            string `json:"custom_id"`
+	Server              string `json:"server"`
+	ReportIntervalMin   int    `json:"report_interval_min"`
+	PayloadCommand      string `json:"payload_command"`
+	SSHEnabled          bool   `json:"ssh_enabled"`
+	SSHLocalHost        string `json:"ssh_local_host"`
+	SSHLocalPort        int    `json:"ssh_local_port"`
+	SSHRetryGapSec      int    `json:"ssh_retry_gap_sec"`
+	RTTEnabled          bool   `json:"rtt_enabled"`
+	ThroughputEnabled   bool   `json:"throughput_enabled"`
+	ThroughputKB        int    `json:"throughput_kb"`
+	DiskUsageEnabled    bool   `json:"disk_usage_enabled"`
+	DiskUsageMountPoint string `json:"disk_usage_mount_point"`
+	UpdateEnabled       bool   `json:"update_enabled"`
+	UpdateCheckURL      string `json:"update_check_url"`
+	UpdateCommand       string `json:"update_command"`
 }
 
 var config = Config{
-	ReportIntervalMin: 3,
-	SSHLocalHost:      "localhost",
-	SSHLocalPort:      22,
-	SSHRetryGapSec:    10,
-	RTTEnabled:        true,
-	ThroughputKB:      500,
-	UpdateEnabled:     true,
-	UpdateCheckURL:    "https://kaginawa.github.io/LATEST",
+	ReportIntervalMin:   3,
+	SSHLocalHost:        "localhost",
+	SSHLocalPort:        22,
+	SSHRetryGapSec:      10,
+	RTTEnabled:          true,
+	ThroughputKB:        500,
+	DiskUsageMountPoint: "/",
+	UpdateEnabled:       true,
+	UpdateCheckURL:      "https://kaginawa.github.io/LATEST",
 }
 
 // loadConfig loads configuration file from default or specified path.
@@ -55,8 +58,12 @@ func loadConfig(path string) error {
 	}
 
 	// Set OS-specific default value
-	if runtime.GOOS == "linux" {
+	switch runtime.GOOS {
+	case "darwin":
+		config.DiskUsageEnabled = true
+	case "linux":
 		config.UpdateCommand = "sudo service restart kaginawa"
+		config.DiskUsageEnabled = true
 	}
 
 	// Parse file
