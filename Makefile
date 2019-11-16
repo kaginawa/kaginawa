@@ -30,11 +30,13 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 	GO111MODULE=on GOOS=windows GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.exe .
 	GO111MODULE=on GOOS=darwin GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.macos .
 	GO111MODULE=on GOOS=linux GOARCH=amd64 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
-	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm .
+	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm6 .
+	GO111MODULE=on GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm7 .
 	zip -jmq9 build/kaginawa.exe.zip build/kaginawa.exe
 	bzip2 -f build/kaginawa.macos
 	bzip2 -f build/kaginawa.linux-x64
-	bzip2 -f build/kaginawa.linux-arm
+	bzip2 -f build/kaginawa.linux-arm6
+	bzip2 -f build/kaginawa.linux-arm7
 	git describe --tags
 
 .PHONY: count

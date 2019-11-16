@@ -67,12 +67,41 @@ func latest() (string, bool) {
 	return latest, currentVer == latest
 }
 
+func binaryURL() string {
+	if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-x64.bz2", 1)
+	}
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
+		if machine, err := exec.Command("uname", "-m").Output(); err != nil {
+			if strings.HasPrefix(string(machine), "armv6") {
+				return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
+			}
+		}
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
+	}
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
+	}
+	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.exe.zip", 1)
+	}
+	return ""
+}
+
 func download() (string, error) {
-	url := ""
+	url := binaryURL()
+	if len(url) == 0 {
+		return "", fmt.Errorf("unsupported machine: GOOS=%s GOARCH=%s", runtime.GOOS, runtime.GOARCH)
+	}
 	if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-x64.bz2", 1)
 	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
+		if machine, err := exec.Command("uname", "-m").Output(); err != nil {
+			if strings.HasPrefix(string(machine), "armv6") {
+				url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
+			}
+		}
 	} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
 	} else if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
