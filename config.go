@@ -32,6 +32,7 @@ type Config struct {
 
 var config = Config{
 	ReportIntervalMin:   3,
+	SSHEnabled:          true,
 	SSHLocalHost:        "localhost",
 	SSHLocalPort:        22,
 	SSHRetryGapSec:      10,
