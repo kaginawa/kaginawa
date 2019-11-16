@@ -155,12 +155,12 @@ func usbDevices() ([]usbDevice, error) {
 		for _, line := range strings.Split(string(raw), "\n") {
 			tokens := strings.Split(line, " ")
 			if len(tokens) < 7 {
-				return nil, fmt.Errorf("invalid record: %s", line)
+				continue
 			}
 			devices = append(devices, usbDevice{
-				Name:      strings.Join(tokens[7:], " "),
+				Name:      strings.Join(tokens[6:], " "),
 				VendorID:  tokens[5][0:4],
-				ProductID: tokens[5][4:8],
+				ProductID: tokens[5][5:9],
 				Location:  strings.TrimRight(strings.Join(tokens[0:4], " "), ":"),
 			})
 		}
