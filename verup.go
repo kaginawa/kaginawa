@@ -97,7 +97,7 @@ func download() (string, error) {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-x64.bz2", 1)
 	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
-		if machine, err := exec.Command("uname", "-m").Output(); err != nil {
+		if machine, err := exec.Command("uname", "-m").Output(); err == nil {
 			if strings.HasPrefix(string(machine), "armv6") {
 				url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
 			}
