@@ -3,7 +3,7 @@ Description=kaginawa
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/kaginawa -c /etc/kaginawa.json
+ExecStart=/opt/kaginawa/kaginawa -c /opt/kaginawa/kaginawa.json
 Restart=always
 User=kaginawa
 
