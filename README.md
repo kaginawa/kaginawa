@@ -135,6 +135,16 @@ Support status and configuration default values:
 
 Sample unit file is available at [kaginawa.service](kaginawa.service).
 
+Usage:
+
+```
+$ wget https://raw.githubusercontent.com/kaginawa/kaginawa/master/kaginawa.service
+// review and edit file content
+$ mv kaginawa.service /etc/systemd/system/
+$ sudo systemctl enable kaginawa
+$ sudo service kaginawa start
+```
+
 ### SSH Server
 
 #### User Setup
