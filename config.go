@@ -65,7 +65,7 @@ func loadConfig(path string) error {
 	case "darwin":
 		config.DiskUsageEnabled = true
 	case "linux":
-		config.UpdateCommand = "sudo service restart kaginawa"
+		config.UpdateCommand = "sudo service kaginawa restart"
 		config.DiskUsageEnabled = true
 	}
 
