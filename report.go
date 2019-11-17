@@ -43,6 +43,7 @@ type report struct {
 	DiskMountPoint string      `json:"disk_mount_point,omitempty"` // Mount point (default is root)
 	DiskDevice     string      `json:"disk_device,omitempty"`      // Disk device name
 	USBDevices     []usbDevice `json:"usb_devices,omitempty"`      // List of usb devices
+	BDLocalDevices []string    `json:"bd_local_devices,omitempty"` // List of Bluetooth local devices
 	Errors         []string    `json:"errors,omitempty"`           // List of errors
 	Payload        string      `json:"payload,omitempty"`          // Custom content provided by payload command
 	PayloadCmd     string      `json:"payload_cmd,omitempty"`      // Executed payload command
@@ -135,9 +136,16 @@ func genReport(trigger int) report {
 	}
 	if config.USBScanEnabled {
 		if rep, err := usbDevices(); err != nil {
-			report.Errors = append(report.Errors, fmt.Sprintf("failed to obtain usb devices information: %v", err))
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to obtain list of usb devices: %v", err))
 		} else {
 			report.USBDevices = rep
+		}
+	}
+	if config.BTScanEnabled {
+		if rep, err := bdLocalDevices(); err != nil {
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to obtain list of bluetooth devices: %v", err))
+		} else {
+			report.BDLocalDevices = rep
 		}
 	}
 

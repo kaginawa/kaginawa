@@ -21,8 +21,9 @@ type diskUsageReport struct {
 }
 
 type darwinSystemProfile struct {
-	StorageDataType []darwinStorageDataType `json:"SPStorageDataType"`
-	USBDataType     []darwinUSBDataType     `json:"SPUSBDataType"`
+	Storage   []darwinStorageDataType   `json:"SPStorageDataType"`
+	USB       []darwinUSBDataType       `json:"SPUSBDataType"`
+	Bluetooth []darwinBluetoothDataType `json:"SPBluetoothDataType"`
 }
 
 type darwinStorageDataType struct {
@@ -40,6 +41,12 @@ type darwinUSBDataType struct {
 	ProductID string              `json:"product_id"`
 	Location  string              `json:"location_id"`
 	Items     []darwinUSBDataType `json:"_items"`
+}
+
+type darwinBluetoothDataType struct {
+	LocalDeviceTitle struct {
+		Address string `json:"general_address"`
+	} `json:"local_device_title"`
 }
 
 func initID() error {
@@ -83,7 +90,7 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		if err := json.Unmarshal(raw, &profile); err != nil {
 			return nil, err
 		}
-		for _, record := range profile.StorageDataType {
+		for _, record := range profile.Storage {
 			if record.MountPoint == mountPoint {
 				return &diskUsageReport{
 					TotalBytes: record.TotalBytes,
@@ -145,7 +152,7 @@ func usbDevices() ([]usbDevice, error) {
 		if err := json.Unmarshal(raw, &profile); err != nil {
 			return nil, err
 		}
-		return extractUSBProfile(profile.USBDataType), nil
+		return extractUSBProfile(profile.USB), nil
 	case "linux":
 		raw, err := exec.Command("lsusb").Output()
 		if err != nil {
@@ -165,6 +172,43 @@ func usbDevices() ([]usbDevice, error) {
 			})
 		}
 		return devices, nil
+	default:
+		return nil, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+}
+
+func bdLocalDevices() ([]string, error) {
+	switch runtime.GOOS {
+	case "darwin":
+		raw, err := exec.Command("system_profiler", "-json", "SPBluetoothDataType").Output()
+		if err != nil {
+			return nil, err
+		}
+		var profile darwinSystemProfile
+		if err := json.Unmarshal(raw, &profile); err != nil {
+			return nil, err
+		}
+		var addresses []string
+		for _, item := range profile.Bluetooth {
+			if len(item.LocalDeviceTitle.Address) > 0 {
+				addresses = append(addresses, strings.ReplaceAll(item.LocalDeviceTitle.Address, "-", ":"))
+			}
+		}
+		return addresses, nil
+	case "linux":
+		raw, err := exec.Command("hcitool", "dev").Output()
+		if err != nil {
+			return nil, err
+		}
+		var addresses []string
+		for _, line := range strings.Split(string(raw), "\n") {
+			tokens := strings.Split(line, "\t")
+			if len(tokens) != 3 {
+				continue
+			}
+			addresses = append(addresses, tokens[2])
+		}
+		return addresses, nil
 	default:
 		return nil, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
 	}

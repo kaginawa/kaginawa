@@ -54,7 +54,8 @@ Minimum configuration:
 | throughput_kb          | int    | 500       | Data size of throughput measurement   |
 | disk_usage_enabled     | bool   | (os deps) | Obtain disk usage                     |
 | disk_usage_mount_point | string | /         | Disk usage for mount point            |
-| usb_scan_enabled       | bool   | false     | Scan list of usb devices              |
+| usb_scan_enabled       | bool   | false     | Scan list of USB devices              |
+| bt_scan_enabled        | bool   | false     | Scan list of Bluetooth devices        |
 | payload_command        | string |           | Payload (additional data) command     |
 | update_enabled         | bool   | true      | Enable / disable automatic update     |
 | update_check_url       | string | (github)  | Latest version information URL        |
@@ -89,13 +90,25 @@ Support status and configuration default values:
 
 Support status and configuration default values:
 
-| OS      | Supported | Default of `disk_usage_enabled` |
-| ------- | --------- | ------------------------------- |
-| Linux   | Yes(*)    | false                           |
-| MacOS   | Yes       | false                           |
-| Windows | No        | false                           |
+| OS      | Supported | Default of `usb_scan_enabled` |
+| ------- | --------- | ----------------------------- |
+| Linux   | Yes(*)    | false                         |
+| MacOS   | Yes       | false                         |
+| Windows | No        | false                         |
 
 (*) `lsusb` command is required.
+
+#### Bluetooth Devices Information
+
+Support status and configuration default values:
+
+| OS      | Supported | Default of `bt_scan_enabled` |
+| ------- | --------- | ---------------------------- |
+| Linux   | Yes(*)    | false                        |
+| MacOS   | Yes       | false                        |
+| Windows | No        | false                        |
+
+(*) `hcitool` command is required.
 
 #### Automatic Update
 

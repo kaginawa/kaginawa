@@ -26,6 +26,7 @@ type Config struct {
 	DiskUsageEnabled    bool   `json:"disk_usage_enabled"`
 	DiskUsageMountPoint string `json:"disk_usage_mount_point"`
 	USBScanEnabled      bool   `json:"usb_scan_enabled"`
+	BTScanEnabled       bool   `json:"bt_scan_enabled"`
 	UpdateEnabled       bool   `json:"update_enabled"`
 	UpdateCheckURL      string `json:"update_check_url"`
 	UpdateCommand       string `json:"update_command"`
