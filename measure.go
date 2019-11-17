@@ -11,7 +11,7 @@ import (
 
 func measureRoundTripTimeMills() (int64, error) {
 	begin := time.Now()
-	resp, err := http.Get("http://" + config.Server + "/measure/10240") // Use http to reduce overhead
+	resp, err := http.Get("http://" + config.Server + "/measure/0") // Use http to reduce overhead
 	if err != nil {
 		return -1, err
 	}

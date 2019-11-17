@@ -9,7 +9,6 @@ import (
 	"runtime"
 	"strconv"
 	"strings"
-	"text/scanner"
 )
 
 type diskUsageReport struct {
@@ -22,7 +21,9 @@ type diskUsageReport struct {
 }
 
 type darwinSystemProfile struct {
-	StorageDataType []darwinStorageDataType `json:"SPStorageDataType"`
+	Storage   []darwinStorageDataType   `json:"SPStorageDataType"`
+	USB       []darwinUSBDataType       `json:"SPUSBDataType"`
+	Bluetooth []darwinBluetoothDataType `json:"SPBluetoothDataType"`
 }
 
 type darwinStorageDataType struct {
@@ -32,6 +33,20 @@ type darwinStorageDataType struct {
 	FreeBytes  int64  `json:"free_space_in_bytes"`
 	MountPoint string `json:"mount_point"`
 	TotalBytes int64  `json:"size_in_bytes"`
+}
+
+type darwinUSBDataType struct {
+	Name      string              `json:"_name"`
+	VendorID  string              `json:"vendor_id"`
+	ProductID string              `json:"product_id"`
+	Location  string              `json:"location_id"`
+	Items     []darwinUSBDataType `json:"_items"`
+}
+
+type darwinBluetoothDataType struct {
+	LocalDeviceTitle struct {
+		Address string `json:"general_address"`
+	} `json:"local_device_title"`
 }
 
 func initID() error {
@@ -75,7 +90,7 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		if err := json.Unmarshal(raw, &profile); err != nil {
 			return nil, err
 		}
-		for _, record := range profile.StorageDataType {
+		for _, record := range profile.Storage {
 			if record.MountPoint == mountPoint {
 				return &diskUsageReport{
 					TotalBytes: record.TotalBytes,
@@ -97,8 +112,6 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 		if len(lines) < 2 {
 			return nil, fmt.Errorf("no record: %s", string(raw))
 		}
-		var s scanner.Scanner
-		s.Init(strings.NewReader(lines[1]))
 		tokens := make([]string, 0)
 		for _, tok := range strings.Split(lines[1], " ") {
 			if len(tok) > 0 {
@@ -128,10 +141,101 @@ func diskUsage(mountPoint string) (*diskUsageReport, error) {
 	}
 }
 
+func usbDevices() ([]usbDevice, error) {
+	switch runtime.GOOS {
+	case "darwin":
+		raw, err := exec.Command("system_profiler", "-json", "SPUSBDataType").Output()
+		if err != nil {
+			return nil, err
+		}
+		var profile darwinSystemProfile
+		if err := json.Unmarshal(raw, &profile); err != nil {
+			return nil, err
+		}
+		return extractUSBProfile(profile.USB), nil
+	case "linux":
+		raw, err := exec.Command("lsusb").Output()
+		if err != nil {
+			return nil, err
+		}
+		var devices []usbDevice
+		for _, line := range strings.Split(string(raw), "\n") {
+			tokens := strings.Split(line, " ")
+			if len(tokens) < 7 {
+				continue
+			}
+			devices = append(devices, usbDevice{
+				Name:      strings.Join(tokens[6:], " "),
+				VendorID:  tokens[5][0:4],
+				ProductID: tokens[5][5:9],
+				Location:  strings.TrimRight(strings.Join(tokens[0:4], " "), ":"),
+			})
+		}
+		return devices, nil
+	default:
+		return nil, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+}
+
+func bdLocalDevices() ([]string, error) {
+	switch runtime.GOOS {
+	case "darwin":
+		raw, err := exec.Command("system_profiler", "-json", "SPBluetoothDataType").Output()
+		if err != nil {
+			return nil, err
+		}
+		var profile darwinSystemProfile
+		if err := json.Unmarshal(raw, &profile); err != nil {
+			return nil, err
+		}
+		var addresses []string
+		for _, item := range profile.Bluetooth {
+			if len(item.LocalDeviceTitle.Address) > 0 {
+				addresses = append(addresses, strings.ReplaceAll(item.LocalDeviceTitle.Address, "-", ":"))
+			}
+		}
+		return addresses, nil
+	case "linux":
+		raw, err := exec.Command("hcitool", "dev").Output()
+		if err != nil {
+			return nil, err
+		}
+		var addresses []string
+		for _, line := range strings.Split(string(raw), "\n") {
+			tokens := strings.Split(line, "\t")
+			if len(tokens) != 3 {
+				continue
+			}
+			addresses = append(addresses, tokens[2])
+		}
+		return addresses, nil
+	default:
+		return nil, fmt.Errorf("unsupported platform: %s", runtime.GOOS)
+	}
+}
+
 func trimSubnetMusk(addr net.Addr) string {
 	i := strings.Index(addr.String(), "/")
 	if i > 0 {
 		return addr.String()[0:i]
 	}
 	return addr.String()
+}
+
+func extractUSBProfile(list []darwinUSBDataType) []usbDevice {
+	var devices []usbDevice
+	for _, item := range list {
+		if strings.HasPrefix(item.VendorID, "0x") && len(item.VendorID) >= 6 && len(item.ProductID) >= 6 {
+			devices = append(devices, usbDevice{
+				Name:      strings.Trim(item.VendorID[6:], " ()") + " " + item.Name,
+				VendorID:  item.VendorID[2:6],
+				ProductID: item.ProductID[2:6],
+				Location:  item.Location,
+			})
+		}
+		if len(item.Items) > 0 {
+			devices = append(devices, extractUSBProfile(item.Items)...)
+		}
+	}
+	return devices
 }

@@ -24,6 +24,8 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 
 ## Configuration
 
+### Overview
+
 Default configuration file name is `kaginawa.json`.
 
 Minimum configuration:
@@ -35,7 +37,7 @@ Minimum configuration:
 }
 ```
 
-All parameters and default values:
+### Available Parameters
 
 | Parameter              | Type   | Default   | Description                           |
 | ---------------------- | ------ | --------- | ------------------------------------- |
@@ -52,6 +54,8 @@ All parameters and default values:
 | throughput_kb          | int    | 500       | Data size of throughput measurement   |
 | disk_usage_enabled     | bool   | (os deps) | Obtain disk usage                     |
 | disk_usage_mount_point | string | /         | Disk usage for mount point            |
+| usb_scan_enabled       | bool   | false     | Scan list of USB devices              |
+| bt_scan_enabled        | bool   | false     | Scan list of Bluetooth devices        |
 | payload_command        | string |           | Payload (additional data) command     |
 | update_enabled         | bool   | true      | Enable / disable automatic update     |
 | update_check_url       | string | (github)  | Latest version information URL        |
@@ -67,6 +71,56 @@ Sample configuration for payload uploading:
   "payload_command": "curl https://api.ipify.org?format=json"
 }
 ```
+
+### Feature Specific Information
+
+#### Disk Usage
+
+Support status and configuration default values:
+
+| OS      | Supported | Default of `disk_usage_enabled` | Default of `disk_usage_mount_point` |
+| ------- | --------- | ------------------------------- | ----------------------------------- |
+| Linux   | Yes(*)    | true                            | /                                   |
+| MacOS   | Yes       | true                            | /                                   |
+| Windows | No        | false                           | (empty)                             |
+
+(*) `df` command is required.
+
+#### USB Devices Information
+
+Support status and configuration default values:
+
+| OS      | Supported | Default of `usb_scan_enabled` |
+| ------- | --------- | ----------------------------- |
+| Linux   | Yes(*)    | false                         |
+| MacOS   | Yes       | false                         |
+| Windows | No        | false                         |
+
+(*) `lsusb` command is required.
+
+#### Bluetooth Devices Information
+
+Support status and configuration default values:
+
+| OS      | Supported | Default of `bt_scan_enabled` |
+| ------- | --------- | ---------------------------- |
+| Linux   | Yes(*)    | false                        |
+| MacOS   | Yes       | false                        |
+| Windows | No        | false                        |
+
+(*) `hcitool` command is required.
+
+#### Automatic Update
+
+Default values of `update_command` configuration parameter:
+
+Support status and configuration default values:
+
+| OS      | Supported | Default of `update_enabled` | Default of `update_command`     |
+| ------- | --------- | --------------------------- | ------------------------------- |
+| Linux   | Yes       | true                        | `sudo service restart kaginawa` |
+| MacOS   | Yes       | true                        | (empty)                         |
+| Windows | Yes       | true                        | (empty)                         |
 
 ## Development
 
@@ -99,17 +153,6 @@ $ cat remote
 
 NOTE: A login shell is not required for tunneling connections.
 Use `/bin/false` to reduce the risk of server hijacking.
-
-### Automatic Update
-
-Default values of `update_command` configuration parameter:
-
-| OS      | Default value                   |
-| ------- | ------------------------------- |
-| Linux   | `sudo service restart kaginawa` |
-| MacOS   | (empty)                         |
-| Windows | (empty)                         |
-
 ## License
 
 Kaginawa licensed under the [BSD 3-clause license](LICENSE).

@@ -16,35 +16,44 @@ import (
 
 // report defines all of report attributes
 type report struct {
-	ID             string   `json:"id"`                         // MAC address of the primary network interface
-	Trigger        int      `json:"trigger"`                    // Report trigger (-1: connected, 0: boot, n: interval)
-	Runtime        string   `json:"runtime"`                    // OS and arch
-	Success        bool     `json:"success"`                    // Equals len(Errors) == 0
-	Sequence       int      `json:"seq"`                        // Report sequence number, resets by reboot or restart
-	DeviceTime     int64    `json:"device_time"`                // Device time (UTC) by time.Now().UTC().Unix()
-	BootTime       int64    `json:"boot_time"`                  // Device boot time (UTC)
-	GenMillis      int64    `json:"gen_ms"`                     // Generation time milliseconds
-	AgentVersion   string   `json:"agent_version"`              // Agent version
-	CustomID       string   `json:"custom_id,omitempty"`        // User specified ID
-	SSHServerHost  string   `json:"ssh_server_host,omitempty"`  // Connected SSH server host
-	SSHRemotePort  int      `json:"ssh_remote_port,omitempty"`  // Connected SSH remote port
-	SSHConnectTime int64    `json:"ssh_connect_time,omitempty"` // Connected time of the SSH
-	Adapter        string   `json:"adapter,omitempty"`          // Name of network adapter that source of the MAC address
-	LocalIPv4      string   `json:"ip4_local,omitempty"`        // Local IPv6 address
-	LocalIPv6      string   `json:"ip6_local,omitempty"`        // Local IPv6 address
-	Hostname       string   `json:"hostname,omitempty"`         // OS Hostname
-	RTTMills       int64    `json:"rtt_ms,omitempty"`           // Round trip time milliseconds
-	UploadKBPS     int64    `json:"upload_bps,omitempty"`       // Upload throughput bps
-	DownloadKBPS   int64    `json:"download_bps,omitempty"`     // Download throughput bps
-	DiskTotalBytes int64    `json:"disk_total_bytes,omitempty"` // Total disk space (Bytes)
-	DiskUsedBytes  int64    `json:"disk_used_bytes,omitempty"`  // Used disk space (Bytes)
-	DiskLabel      string   `json:"disk_label,omitempty"`       // Disk label
-	DiskFilesystem string   `json:"disk_filesystem,omitempty"`  // Disk filesystem name
-	DiskMountPoint string   `json:"disk_mount_point,omitempty"` // Mount point (default is root)
-	DiskDevice     string   `json:"disk_device,omitempty"`      // Disk device name
-	Errors         []string `json:"errors,omitempty"`           // List of errors
-	Payload        string   `json:"payload,omitempty"`          // Custom content provided by payload command
-	PayloadCmd     string   `json:"payload_cmd,omitempty"`      // Executed payload command
+	ID             string      `json:"id"`                         // MAC address of the primary network interface
+	Trigger        int         `json:"trigger"`                    // Report trigger (-1: connected, 0: boot, n: timer)
+	Runtime        string      `json:"runtime"`                    // OS and arch
+	Success        bool        `json:"success"`                    // Equals len(Errors) == 0
+	Sequence       int         `json:"seq"`                        // Report sequence number from process start
+	DeviceTime     int64       `json:"device_time"`                // Device time (UTC) by time.Now().UTC().Unix()
+	BootTime       int64       `json:"boot_time"`                  // Device boot time (UTC)
+	GenMillis      int64       `json:"gen_ms"`                     // Generation time milliseconds
+	AgentVersion   string      `json:"agent_version"`              // Agent version
+	CustomID       string      `json:"custom_id,omitempty"`        // User specified ID
+	SSHServerHost  string      `json:"ssh_server_host,omitempty"`  // Connected SSH server host
+	SSHRemotePort  int         `json:"ssh_remote_port,omitempty"`  // Connected SSH remote port
+	SSHConnectTime int64       `json:"ssh_connect_time,omitempty"` // Connected time of the SSH
+	Adapter        string      `json:"adapter,omitempty"`          // Name of network adapter, source of the MAC address
+	LocalIPv4      string      `json:"ip4_local,omitempty"`        // Local IPv6 address
+	LocalIPv6      string      `json:"ip6_local,omitempty"`        // Local IPv6 address
+	Hostname       string      `json:"hostname,omitempty"`         // OS Hostname
+	RTTMills       int64       `json:"rtt_ms,omitempty"`           // Round trip time milliseconds
+	UploadKBPS     int64       `json:"upload_bps,omitempty"`       // Upload throughput bps
+	DownloadKBPS   int64       `json:"download_bps,omitempty"`     // Download throughput bps
+	DiskTotalBytes int64       `json:"disk_total_bytes,omitempty"` // Total disk space (Bytes)
+	DiskUsedBytes  int64       `json:"disk_used_bytes,omitempty"`  // Used disk space (Bytes)
+	DiskLabel      string      `json:"disk_label,omitempty"`       // Disk label
+	DiskFilesystem string      `json:"disk_filesystem,omitempty"`  // Disk filesystem name
+	DiskMountPoint string      `json:"disk_mount_point,omitempty"` // Mount point (default is root)
+	DiskDevice     string      `json:"disk_device,omitempty"`      // Disk device name
+	USBDevices     []usbDevice `json:"usb_devices,omitempty"`      // List of usb devices
+	BDLocalDevices []string    `json:"bd_local_devices,omitempty"` // List of Bluetooth local devices
+	Errors         []string    `json:"errors,omitempty"`           // List of errors
+	Payload        string      `json:"payload,omitempty"`          // Custom content provided by payload command
+	PayloadCmd     string      `json:"payload_cmd,omitempty"`      // Executed payload command
+}
+
+type usbDevice struct {
+	Name      string `json:"name,omitempty"`
+	VendorID  string `json:"vendor_id,omitempty"`
+	ProductID string `json:"product_id,omitempty"`
+	Location  string `json:"location,omitempty"`
 }
 
 // reply defines all of reply message attributes
@@ -61,12 +70,20 @@ var seq = 0
 
 // doReport generates and uploads a record.
 func doReport(trigger int) {
-	data, err := json.MarshalIndent(genReport(trigger), "", "  ")
-	if err != nil {
-		log.Fatalf("failed to marshal report: %v", err)
-	}
+	report := genReport(trigger)
+	var data []byte
+	var err error
 	if *debugPrint {
+		data, err = json.MarshalIndent(report, "", "  ")
+		if err != nil {
+			log.Fatalf("failed to marshal report: %v", err)
+		}
 		log.Printf("REPORT: %s", string(data))
+	} else {
+		data, err = json.Marshal(report)
+		if err != nil {
+			log.Fatalf("failed to marshal report: %v", err)
+		}
 	}
 	if strings.Contains(config.Server, "localhost") {
 		if err := uploadReport(data, "http"); err != nil {
@@ -123,6 +140,20 @@ func genReport(trigger int) report {
 			report.DiskFilesystem = rep.Filesystem
 			report.DiskMountPoint = rep.MountPoint
 			report.DiskDevice = rep.Device
+		}
+	}
+	if config.USBScanEnabled {
+		if rep, err := usbDevices(); err != nil {
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to obtain list of usb devices: %v", err))
+		} else {
+			report.USBDevices = rep
+		}
+	}
+	if config.BTScanEnabled {
+		if rep, err := bdLocalDevices(); err != nil {
+			report.Errors = append(report.Errors, fmt.Sprintf("failed to obtain list of bluetooth devices: %v", err))
+		} else {
+			report.BDLocalDevices = rep
 		}
 	}
 
