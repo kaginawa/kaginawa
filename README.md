@@ -118,7 +118,7 @@ Support status and configuration default values:
 
 | OS      | Supported | Default of `update_enabled` | Default of `update_command`     |
 | ------- | --------- | --------------------------- | ------------------------------- |
-| Linux   | Yes       | true                        | `sudo service restart kaginawa` |
+| Linux   | Yes       | true                        | `sudo service kaginawa restart` |
 | MacOS   | Yes       | true                        | (empty)                         |
 | Windows | Yes       | true                        | (empty)                         |
 
