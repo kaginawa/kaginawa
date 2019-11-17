@@ -145,7 +145,7 @@ $ sudo systemctl enable kaginawa
 $ sudo service kaginawa start
 ```
 
-Recommended kaginawa user creation step:
+Example user creation and setup operation:
 
 ```
 $ sudo useradd -d /opt/kaginawa -m kaginawa
