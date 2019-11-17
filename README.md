@@ -145,6 +145,26 @@ $ sudo systemctl enable kaginawa
 $ sudo service kaginawa start
 ```
 
+Example user creation and setup operation:
+
+```
+$ sudo useradd -d /opt/kaginawa -m kaginawa
+$ sudo -su kaginawa
+$ cd /opt/kaginawa
+$ wget https://kaginawa.github.io/kaginawa.<PLATFORM>.bz2
+$ bunzip kaginawa.<PLATFORM>.bz2
+$ mv kaginawa.<PLATFORM> kaginawa
+$ chmod +x kaginawa
+$ vi kaginawa.json
+// create configuration file (api_key and server are required)
+```
+
+Recommended sudo configuration (`/etc/sudoers` or `/etc/sudoers.d/90-kaginawa`):
+
+```
+kaginawa ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/service
+```
+
 ### SSH Server
 
 #### User Setup
