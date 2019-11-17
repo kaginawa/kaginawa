@@ -70,12 +70,20 @@ var seq = 0
 
 // doReport generates and uploads a record.
 func doReport(trigger int) {
-	data, err := json.MarshalIndent(genReport(trigger), "", "  ")
-	if err != nil {
-		log.Fatalf("failed to marshal report: %v", err)
-	}
+	report := genReport(trigger)
+	var data []byte
+	var err error
 	if *debugPrint {
+		data, err = json.MarshalIndent(report, "", "  ")
+		if err != nil {
+			log.Fatalf("failed to marshal report: %v", err)
+		}
 		log.Printf("REPORT: %s", string(data))
+	} else {
+		data, err = json.Marshal(report)
+		if err != nil {
+			log.Fatalf("failed to marshal report: %v", err)
+		}
 	}
 	if strings.Contains(config.Server, "localhost") {
 		if err := uploadReport(data, "http"); err != nil {
