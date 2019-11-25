@@ -172,9 +172,9 @@ kaginawa ALL=(ALL) NOPASSWD: /sbin/reboot, /usr/sbin/service
 ```
 $ sudo useradd -m -s /bin/false kaginawa
 $ sudo -su kaginawa
-$ cd
+$ ssh-keygen
+$ cd ~/.ssh
 $ ssh-keygen -f remote
-$ cd .ssh
 $ cat remote.pub >> authorized_keys
 $ chmod 600 authorized_keys
 $ cat remote
