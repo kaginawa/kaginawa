@@ -70,6 +70,9 @@ var seq = 0
 
 // doReport generates and uploads a record.
 func doReport(trigger int) {
+	if err := initID(); err != nil {
+		log.Printf("failed to rescan ID: %v", err)
+	}
 	report := genReport(trigger)
 	var data []byte
 	var err error
