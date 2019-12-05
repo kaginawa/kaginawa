@@ -96,12 +96,14 @@ func download() (string, error) {
 	if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-x64.bz2", 1)
 	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
+		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm7.bz2", 1)
 		if machine, err := exec.Command("uname", "-m").Output(); err == nil {
 			if strings.HasPrefix(string(machine), "armv6") {
 				url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
 			}
 		}
+	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm8.bz2", 1)
 	} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
 	} else if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
