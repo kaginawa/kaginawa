@@ -10,7 +10,10 @@ import (
 	"time"
 )
 
-const defaultConfigFilePath = "kaginawa.json"
+const (
+	defaultConfigFilePath = "kaginawa.json"
+	macDetectionRetrySec  = 15
+)
 
 var (
 	ver            = "v0.0.0"
@@ -43,8 +46,14 @@ func main() {
 	}
 
 	// Determine the ID
-	if err := initID(); err != nil {
-		log.Fatal(err)
+	for {
+		if err := initID(); err != nil {
+			fmt.Printf("failed to determine active network interface: %v\n", err)
+			fmt.Printf("retring after %d sec...\n", macDetectionRetrySec)
+			time.Sleep(macDetectionRetrySec * time.Second)
+			continue
+		}
+		break
 	}
 	log.Printf("Kaginawa %s on %s", ver, macAddr)
 
