@@ -12,10 +12,10 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 
 - SSH tunneling to pass through NATs and firewalls
 - Automatic port assignment and reporting
-- Physical MAC address based device identification
+- Device identification using physical MAC address
 - Basic metrics collection and alive monitoring
 - Scalable and fault tolerant design
-- (Future work) Automatic update
+- Automatic update
 
 ## System Requirements
 
