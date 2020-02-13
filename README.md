@@ -183,6 +183,48 @@ $ cat remote
 
 NOTE: A login shell is not required for tunneling connections.
 Use `/bin/false` to reduce the risk of server hijacking.
+
+#### Increase ulimit
+
+Each SSH session consumes file discriptor on the filesystem.
+We recommend to increase the limit of number of file discriptors when connecting large number of nodes.
+
+`/etc/security/limits.conf`:
+
+```
+#<domain> <type> <item> <value>
+* hard nofile 64000
+* soft nofile 64000
+```
+
+If you using kaginawa with root user (not recommended), write following configuration:
+
+```
+#<domain> <type> <item> <value>
+root hard nofile 64000
+root soft nofile 64000
+```
+
+#### Increase swap space
+
+Each SSH session consumes a lot of memory due to the stack size overhead of processes but do not need to keep inactive sessions in memory.
+We recommend to create or increase swap space and enable it.
+
+```
+$ sudo fallocate -l 8G /swapfile
+$ sudo chmod 600 /swapfile
+$ sudo mkswap /swapfile
+$ sudo swapon /swapfile
+```
+
+NOTE: If `fallocate` doesn't work, try `sudo dd if=/dev/zero of=/swapfile count=8192 bs=1M` (inefficient but reliable)
+
+`/etc/fstab`:
+
+```
+/swapfile none swap sw 0 0
+```
+
 ## License
 
 Kaginawa licensed under the [BSD 3-clause license](LICENSE).
