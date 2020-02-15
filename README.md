@@ -2,6 +2,7 @@ kaginawa
 ========
 
 [![Actions Status](https://github.com/kaginawa/kaginawa/workflows/Go/badge.svg)](https://github.com/kaginawa/kaginawa/actions)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=kaginawa_kaginawa&metric=alert_status)](https://sonarcloud.io/dashboard?id=kaginawa_kaginawa)
 [![Go Report Card](https://goreportcard.com/badge/github.com/kaginawa/kaginawa)](https://goreportcard.com/report/github.com/kaginawa/kaginawa)
 
 Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software designed for IoT gateways.
