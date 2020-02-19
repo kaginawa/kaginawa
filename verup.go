@@ -29,23 +29,27 @@ func updateChecker() {
 }
 
 func checkAndUpdate() (finished bool) {
-	if newVer, newest := latest(); !newest {
-		log.Printf("starging version up process: %s -> %s", ver, newVer)
-		if tempFileName, err := download(); err != nil {
-			log.Printf("failed to download version %s: %v", newVer, err)
-		} else {
-			if err := replace(tempFileName); err != nil {
-				log.Printf("download complete. please restart process manually.")
-			} else {
-				if len(config.UpdateCommand) > 0 {
-					log.Print("download complete. now executing restart...")
-					restart()
-				}
-				return true
-			}
-		}
+	newVer, newest := latest()
+	if newest {
+		return false
 	}
-	return false
+	log.Printf("starging version up process: %s -> %s", ver, newVer)
+	tempFileName, err := download()
+	if err != nil {
+		log.Printf("failed to download version %s: %v", newVer, err)
+		return false
+	}
+	if err := replace(tempFileName); err != nil {
+		log.Printf("automatic update disabled due to binary replacement failed: %v", err)
+		return true
+	}
+	if len(config.UpdateCommand) > 0 {
+		log.Print("download complete. now executing restart...")
+		restart()
+		return true
+	}
+	log.Printf("download complete. please restart process manually.")
+	return true
 }
 
 func latest() (string, bool) {
@@ -92,24 +96,6 @@ func download() (string, error) {
 	url := binaryURL()
 	if len(url) == 0 {
 		return "", fmt.Errorf("unsupported machine: GOOS=%s GOARCH=%s", runtime.GOOS, runtime.GOARCH)
-	}
-	if runtime.GOOS == "linux" && runtime.GOARCH == "amd64" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-x64.bz2", 1)
-	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm7.bz2", 1)
-		if machine, err := exec.Command("uname", "-m").Output(); err == nil {
-			if strings.HasPrefix(string(machine), "armv6") {
-				url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
-			}
-		}
-	} else if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm8.bz2", 1)
-	} else if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
-	} else if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
-		url = strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.exe.zip", 1)
-	} else {
-		return "", fmt.Errorf("unsupporte os: %v", runtime.GOOS)
 	}
 	resp, err := http.Get(url)
 	if err != nil {
@@ -160,6 +146,14 @@ func download() (string, error) {
 			return "", err
 		}
 	}
+	stat, err := tempFile.Stat()
+	if err != nil {
+		return "", fmt.Errorf("cannot stat downloaded file: %v", err)
+	}
+	if stat.Size() == 0 {
+		safeRemove(tempFile.Name())
+		return "", fmt.Errorf("empty body: %s", tempFile.Name())
+	}
 	return tempFile.Name(), nil
 }
 
@@ -172,6 +166,10 @@ func replace(tempFileName string) error {
 
 	// tmp -> kaginawa
 	if err := os.Rename(tempFileName, os.Args[0]); err != nil {
+		if err := os.Rename(os.Args[0]+".old", os.Args[0]); err != nil {
+			return fmt.Errorf("failed to recover file: %v", err)
+		}
+		log.Printf("binary recovered using old file: %s.old", os.Args[0])
 		return fmt.Errorf("failed to move file: %v", err)
 	}
 
@@ -195,5 +193,11 @@ func restart() {
 		log.Printf("%s: %v", config.UpdateCommand, err)
 	} else {
 		log.Printf("%s: %s", config.UpdateCommand, res)
+	}
+}
+
+func safeRemove(name string) {
+	if err := os.Remove(name); err != nil {
+		log.Printf("failed to remove %s: %v", name, err)
 	}
 }
