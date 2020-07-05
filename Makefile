@@ -41,7 +41,7 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 	bzip2 -f build/kaginawa.linux-arm8
 	git describe --tags
 
-.PHONY: count
+.PHONY: count-go
 count-go: ## Count number of lines of all go codes
 	find . -name "*.go" -type f | xargs wc -l | tail -n 1
 
