@@ -15,7 +15,7 @@ test: ## Tests all code
 .PHONY: lint
 lint: ## Runs static code analysis
 	command -v golint >/dev/null 2>&1 || { go get golang.org/x/lint/golint; }
-	go list ./... | xargs -L1 golint -set_exit_status
+	golint -set_exit_status ./...
 
 .PHONY: run
 run: ## Run agent without build artifact generation
