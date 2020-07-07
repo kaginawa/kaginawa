@@ -104,7 +104,7 @@ func binaryURL() string {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
 	}
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
-		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos-x64.bz2", 1)
 	}
 	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.exe.zip", 1)
@@ -132,10 +132,13 @@ func download(url string) ([]byte, error) {
 }
 
 func validate(content []byte, checksum []byte) bool {
-	hash := sha256.Sum256(content)
-	log.Printf("expected %s", string(checksum))
-	log.Printf("actual   %s", fmt.Sprintf("%x", hash))
-	return strings.HasPrefix(string(checksum), fmt.Sprintf("%x", hash))
+	expected := string(checksum)
+	actual := fmt.Sprintf("%x", sha256.Sum256(content))
+	if *debugPrint {
+		log.Printf("expected sha256: %s", expected)
+		log.Printf("actual sha256:   %s", actual)
+	}
+	return strings.HasPrefix(expected, actual)
 }
 
 func extract(content []byte) (string, error) {
