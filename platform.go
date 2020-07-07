@@ -1,9 +1,12 @@
 package main
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"log"
 	"net"
 	"os/exec"
 	"runtime"
@@ -242,4 +245,35 @@ func extractUSBProfile(list []darwinUSBDataType) []usbDevice {
 		}
 	}
 	return devices
+}
+
+func kernelVersion() string {
+	if runtime.GOOS == "windows" {
+		v, err := exec.Command("systeminfo", "/FO", "CSV").Output()
+		if err != nil {
+			log.Printf("failed to execute systeminfo: %v", err)
+			return ""
+		}
+		records, err := csv.NewReader(bytes.NewReader(v)).ReadAll()
+		if err != nil {
+			log.Printf("failed to parse systeminfo: %v", err)
+			return ""
+		}
+		if len(records) < 2 {
+			log.Printf("systeminfo too short: len(records) = %d", len(records))
+			return ""
+		}
+		record := records[1]
+		if len(record) < 3 {
+			log.Printf("systeminfo too short: len(record) = %d", len(record))
+			return ""
+		}
+		return record[2]
+	}
+	v, err := exec.Command("uname", "-r").Output()
+	if err != nil {
+		log.Printf("failed to execute uname -r: %v", err)
+		return ""
+	}
+	return strings.TrimRight(string(v), "\n")
 }

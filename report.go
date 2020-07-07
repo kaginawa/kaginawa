@@ -44,6 +44,7 @@ type report struct {
 	DiskDevice     string      `json:"disk_device,omitempty"`      // Disk device name
 	USBDevices     []usbDevice `json:"usb_devices,omitempty"`      // List of usb devices
 	BDLocalDevices []string    `json:"bd_local_devices,omitempty"` // List of Bluetooth local devices
+	KernelVersion  string      `json:"kernel_version,omitempty"`   // Kernel version
 	Errors         []string    `json:"errors,omitempty"`           // List of errors
 	Payload        string      `json:"payload,omitempty"`          // Custom content provided by payload command
 	PayloadCmd     string      `json:"payload_cmd,omitempty"`      // Executed payload command
@@ -123,6 +124,7 @@ func genReport(trigger int) report {
 		LocalIPv4:      localIPv4,
 		Runtime:        runtime.GOOS + " " + runtime.GOARCH,
 		AgentVersion:   ver,
+		KernelVersion:  kernelVersion(),
 	}
 
 	// Get hostname
