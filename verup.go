@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"compress/bzip2"
+	"crypto/sha256"
 	"errors"
 	"fmt"
 	"io"
@@ -34,9 +35,28 @@ func checkAndUpdate() (finished bool) {
 		return false
 	}
 	log.Printf("starging version up process: %s -> %s", ver, newVer)
-	tempFileName, err := download()
+	url := binaryURL()
+	if len(url) == 0 {
+		log.Printf("automatic update disabled due to unsupported machine: %s %s", runtime.GOOS, runtime.GOARCH)
+		return true
+	}
+	archive, err := download(url)
 	if err != nil {
 		log.Printf("failed to download version %s: %v", newVer, err)
+		return false
+	}
+	checksum, err := download(url + ".sha256")
+	if err != nil {
+		log.Printf("failed to download checksum: %v", err)
+		return false
+	}
+	if !validate(archive, checksum) {
+		log.Print("checksum error")
+		return false
+	}
+	tempFileName, err := extract(archive)
+	if err != nil {
+		log.Printf("failed to extract version %s: %v", newVer, err)
 		return false
 	}
 	if err := replace(tempFileName); err != nil {
@@ -92,20 +112,33 @@ func binaryURL() string {
 	return ""
 }
 
-func download() (string, error) {
-	url := binaryURL()
-	if len(url) == 0 {
-		return "", fmt.Errorf("unsupported machine: GOOS=%s GOARCH=%s", runtime.GOOS, runtime.GOARCH)
-	}
+func download(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return "", err
+		return nil, fmt.Errorf("failed to download: %w", err)
 	}
 	defer safeClose(resp.Body, "download link")
 	if resp.StatusCode != http.StatusOK {
-		return "", fmt.Errorf("HTTP %d", resp.StatusCode)
+		return nil, fmt.Errorf("HTTP %s", resp.Status)
 	}
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if len(body) == 0 {
+		return nil, errors.New("empty body")
+	}
+	return body, nil
+}
 
+func validate(content []byte, checksum []byte) bool {
+	hash := sha256.Sum256(content)
+	log.Printf("expected %s", string(checksum))
+	log.Printf("actual   %s", fmt.Sprintf("%x", hash))
+	return strings.HasPrefix(string(checksum), fmt.Sprintf("%x", hash))
+}
+
+func extract(content []byte) (string, error) {
 	// Create temp file
 	tempFile, err := ioutil.TempFile("", "kgnw")
 	if err != nil {
@@ -115,11 +148,7 @@ func download() (string, error) {
 
 	// extract to temp file
 	if runtime.GOOS == "windows" {
-		body, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			return "", err
-		}
-		r, err := zip.NewReader(bytes.NewReader(body), int64(len(body)))
+		r, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
 		if err != nil {
 			return "", nil
 		}
@@ -142,7 +171,7 @@ func download() (string, error) {
 			return "", err
 		}
 	} else {
-		if _, err := io.Copy(tempFile, bzip2.NewReader(resp.Body)); err != nil {
+		if _, err := io.Copy(tempFile, bzip2.NewReader(bytes.NewReader(content))); err != nil {
 			return "", err
 		}
 	}

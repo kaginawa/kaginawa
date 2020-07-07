@@ -39,7 +39,13 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 	bzip2 -f build/kaginawa.linux-arm6
 	bzip2 -f build/kaginawa.linux-arm7
 	bzip2 -f build/kaginawa.linux-arm8
-	git describe --tags
+	cd build; shasum -a 256 kaginawa.exe.zip > kaginawa.exe.zip.sha256
+	cd build; shasum -a 256 kaginawa.macos.bz2 > kaginawa.macos.bz2.sha256
+	cd build; shasum -a 256 kaginawa.linux-x64.bz2 > kaginawa.linux-x64.bz2.sha256
+	cd build; shasum -a 256 kaginawa.linux-arm6.bz2 > kaginawa.linux-arm6.bz2.sha256
+	cd build; shasum -a 256 kaginawa.linux-arm7.bz2 > kaginawa.linux-arm7.bz2.sha256
+	cd build; shasum -a 256 kaginawa.linux-arm8.bz2 > kaginawa.linux-arm8.bz2.sha256
+	git describe --tags > build/LATEST
 
 .PHONY: count-go
 count-go: ## Count number of lines of all go codes
