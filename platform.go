@@ -62,13 +62,17 @@ func initID() error {
 		if err != nil || len(addresses) == 0 {
 			continue // ignore unassigned adapters
 		}
+		var v4, v6 string
 		for _, address := range addresses {
-			if len(localIPv6) == 0 && strings.Contains(address.String(), ":") {
-				localIPv6 = trimSubnetMusk(address)
-			} else if len(localIPv4) == 0 && strings.Contains(address.String(), ".") {
-				localIPv4 = trimSubnetMusk(address)
+			if len(v6) == 0 && strings.Contains(address.String(), ":") {
+				v6 = trimSubnetMusk(address)
+			}
+			if len(v4) == 0 && strings.Contains(address.String(), ".") {
+				v4 = trimSubnetMusk(address)
 			}
 		}
+		localIPv4 = v4
+		localIPv6 = v6
 		macAddr = strings.ToLower(adapter.HardwareAddr.String())
 		adapterName = adapter.Name
 		break
