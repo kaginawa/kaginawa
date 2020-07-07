@@ -28,19 +28,19 @@ build: ## Build executable binaries for local execution
 .PHONY: build-all
 build-all: build ## Build executable binaries for all supported OSs and architectures
 	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.exe .
-	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.macos-x64 .
+	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.macos .
 	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
 	GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm6 .
 	GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm7 .
 	GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm8 .
 	zip -jmq9 build/kaginawa.exe.zip build/kaginawa.exe
-	bzip2 -f build/kaginawa.macos-x64
+	bzip2 -f build/kaginawa.macos
 	bzip2 -f build/kaginawa.linux-x64
 	bzip2 -f build/kaginawa.linux-arm6
 	bzip2 -f build/kaginawa.linux-arm7
 	bzip2 -f build/kaginawa.linux-arm8
 	cd build; shasum -a 256 kaginawa.exe.zip > kaginawa.exe.zip.sha256
-	cd build; shasum -a 256 kaginawa.macos-x64.bz2 > kaginawa.macos-x64.bz2.sha256
+	cd build; shasum -a 256 kaginawa.macos.bz2 > kaginawa.macos.bz2.sha256
 	cd build; shasum -a 256 kaginawa.linux-x64.bz2 > kaginawa.linux-x64.bz2.sha256
 	cd build; shasum -a 256 kaginawa.linux-arm6.bz2 > kaginawa.linux-arm6.bz2.sha256
 	cd build; shasum -a 256 kaginawa.linux-arm7.bz2 > kaginawa.linux-arm7.bz2.sha256

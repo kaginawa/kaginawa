@@ -104,7 +104,7 @@ func binaryURL() string {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
 	}
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
-		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos-x64.bz2", 1)
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos.bz2", 1)
 	}
 	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.exe.zip", 1)
