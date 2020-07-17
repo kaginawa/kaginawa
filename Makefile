@@ -15,7 +15,9 @@ test: ## Tests all code
 .PHONY: lint
 lint: ## Runs static code analysis
 	command -v golint >/dev/null 2>&1 || { go get golang.org/x/lint/golint; }
-	golint -set_exit_status ./...
+	${GOPATH}/bin/golint -set_exit_status ./...
+	command -v errcheck >/dev/null 2>&1 || { go get github.com/kisielk/errcheck; }
+	${GOPATH}/bin/errcheck ./...
 
 .PHONY: run
 run: ## Run agent without build artifact generation
@@ -27,12 +29,13 @@ build: ## Build executable binaries for local execution
 
 .PHONY: build-all
 build-all: build ## Build executable binaries for all supported OSs and architectures
-	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.exe .
-	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.macos-x64 .
-	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-x64 .
-	GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm6 .
-	GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm7 .
-	GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.ver=`git describe --tags`" -o build/kaginawa.linux-arm8 .
+	$(eval VER := $(shell git describe --tags))
+	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.exe .
+	GOOS=darwin GOARCH=amd64 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.macos-x64 .
+	GOOS=linux GOARCH=amd64 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.linux-x64 .
+	GOOS=linux GOARCH=arm GOARM=6 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.linux-arm6 .
+	GOOS=linux GOARCH=arm GOARM=7 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.linux-arm7 .
+	GOOS=linux GOARCH=arm64 go build -ldflags "-s -w -X main.ver=$(VER)" -o build/kaginawa.linux-arm8 .
 	zip -jmq9 build/kaginawa.exe.zip build/kaginawa.exe
 	bzip2 -f build/kaginawa.macos-x64
 	bzip2 -f build/kaginawa.linux-x64
@@ -45,7 +48,7 @@ build-all: build ## Build executable binaries for all supported OSs and architec
 	cd build; shasum -a 256 kaginawa.linux-arm6.bz2 > kaginawa.linux-arm6.bz2.sha256
 	cd build; shasum -a 256 kaginawa.linux-arm7.bz2 > kaginawa.linux-arm7.bz2.sha256
 	cd build; shasum -a 256 kaginawa.linux-arm8.bz2 > kaginawa.linux-arm8.bz2.sha256
-	git describe --tags > build/LATEST
+	echo $(VER) > build/LATEST
 
 .PHONY: count-go
 count-go: ## Count number of lines of all go codes
