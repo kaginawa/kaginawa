@@ -101,7 +101,10 @@ func binaryURL() string {
 				return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
 			}
 		}
-		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm.bz2", 1)
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm7.bz2", 1)
+	}
+	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm8.bz2", 1)
 	}
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos-x64.bz2", 1)
@@ -115,18 +118,18 @@ func binaryURL() string {
 func download(url string) ([]byte, error) {
 	resp, err := http.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download: %w", err)
+		return nil, fmt.Errorf("failed to download %s: %w", url, err)
 	}
 	defer safeClose(resp.Body, "download link")
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("HTTP %s", resp.Status)
+		return nil, fmt.Errorf("%s HTTP %s", url, resp.Status)
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 	if len(body) == 0 {
-		return nil, errors.New("empty body")
+		return nil, errors.New("empty body: " + url)
 	}
 	return body, nil
 }
@@ -191,14 +194,14 @@ func extract(content []byte) (string, error) {
 
 func replace(tempFileName string) error {
 	// kaginawa -> kaginawa.old
-	if err := os.Rename(os.Args[0], os.Args[0]+".old"); err != nil {
+	if err := moveFile(os.Args[0], os.Args[0]+".old"); err != nil {
 		return fmt.Errorf("failed to move file: %v", err)
 	}
 	log.Printf("current binary has been moved to " + os.Args[0] + ".old")
 
 	// tmp -> kaginawa
-	if err := os.Rename(tempFileName, os.Args[0]); err != nil {
-		if err := os.Rename(os.Args[0]+".old", os.Args[0]); err != nil {
+	if err := moveFile(tempFileName, os.Args[0]); err != nil {
+		if err := moveFile(os.Args[0]+".old", os.Args[0]); err != nil {
 			return fmt.Errorf("failed to recover file: %v", err)
 		}
 		log.Printf("binary recovered using old file: %s.old", os.Args[0])
@@ -232,4 +235,34 @@ func safeRemove(name string) {
 	if err := os.Remove(name); err != nil {
 		log.Printf("failed to remove %s: %v", name, err)
 	}
+}
+
+func moveFile(sourcePath, destPath string) error {
+	inputFile, err := os.Open(sourcePath)
+	if err != nil {
+		return fmt.Errorf("failed to open source file: %s", err)
+	}
+	outputFile, err := os.Create(destPath)
+	if err != nil {
+		if err := inputFile.Close(); err != nil {
+			log.Printf("failed to close %s: %v", inputFile.Name(), err)
+		}
+		return fmt.Errorf("failed to open dest file: %s", err)
+	}
+	defer func() {
+		if err := outputFile.Close(); err != nil {
+			log.Printf("failed to close %s: %v", outputFile.Name(), err)
+		}
+	}()
+	_, err = io.Copy(outputFile, inputFile)
+	if err := inputFile.Close(); err != nil {
+		log.Printf("failed to close %s: %v", inputFile.Name(), err)
+	}
+	if err != nil {
+		return fmt.Errorf("failed to write %s: %v", outputFile.Name(), err)
+	}
+	if err = os.Remove(sourcePath); err != nil {
+		return fmt.Errorf("failed to remove original file: %s", err)
+	}
+	return nil
 }
