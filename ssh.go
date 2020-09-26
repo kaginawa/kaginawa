@@ -73,7 +73,7 @@ func openTunnel() error {
 		if err != nil {
 			return fmt.Errorf("failed to listen local socket: %w", err)
 		}
-		handleClient(client, local)
+		go handleClient(client, local)
 	}
 }
 
