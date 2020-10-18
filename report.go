@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
@@ -207,11 +208,21 @@ func genReport(trigger int) report {
 
 // uploadReport uploads a report with specified proto (http or https).
 func uploadReport(report []byte, proto string) error {
-	req, err := http.NewRequest(http.MethodPost, proto+"://"+config.Server+"/report", bytes.NewReader(report))
+	gz := new(bytes.Buffer)
+	w := gzip.NewWriter(gz)
+	if _, err := w.Write(report); err != nil {
+		return fmt.Errorf("failed to gzip report: %v", err)
+	}
+	if err := w.Close(); err != nil {
+		return fmt.Errorf("failed to close gzipped report: %v", err)
+	}
+	req, err := http.NewRequest(http.MethodPost, proto+"://"+config.Server+"/report", gz)
 	if err != nil {
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 	req.Header.Set("Authorization", "token "+config.APIKey)
+	req.Header.Set("Content-Encoding", "gzip")
+	req.Header.Set("Accept-Encoding", "gzip")
 	resp, err := new(http.Client).Do(req)
 	if err != nil {
 		return fmt.Errorf("failed to upload with %s: %v", proto, err)
@@ -219,22 +230,22 @@ func uploadReport(report []byte, proto string) error {
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusCreated {
 		return fmt.Errorf("HTTP %d", resp.StatusCode)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	reader := resp.Body
+	defer safeClose(reader, "report body")
+	if resp.Header.Get("Content-Encoding") == "gzip" {
+		r, err := gzip.NewReader(resp.Body)
+		if err != nil {
+			return fmt.Errorf("failed to read gzipped response: %w", err)
+		}
+		reader = r
+	}
+	body, err := ioutil.ReadAll(reader)
 	if err != nil {
 		return fmt.Errorf("faield to read response: %w", err)
 	}
-	defer safeClose(resp.Body, "report body")
 	var serverMessage reply
 	if err := json.Unmarshal(body, &serverMessage); err != nil {
 		return fmt.Errorf("failed to unmarshal response: %w", err)
-	}
-
-	// Reboot if server is requested
-	if serverMessage.Reboot {
-		log.Print("REBOOT")
-		if _, err := exec.Command("sudo", "reboot").Output(); err != nil {
-			log.Printf("failed to execute reboot command: %v", err)
-		}
 	}
 
 	// Start listening SSH if not started
