@@ -18,10 +18,30 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 - Scalable and fault tolerant design
 - Automatic update
 
+## Download
+
+| OS      | Arch  | Download Link                                                                 | Format | Checksum                                                            |
+| ------- | ----- | ----------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- |
+| Linux   | amd64 | [kaginawa.linux-x64.bz2](https://kaginawa.github.io/kaginawa.linux-x64.bz2)   | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-x64.bz2.sha256)  |
+| Linux   | armv6 | [kaginawa.linux-arm6.bz2](https://kaginawa.github.io/kaginawa.linux-arm6.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm6.bz2.sha256) |
+| Linux   | armv7 | [kaginawa.linux-arm7.bz2](https://kaginawa.github.io/kaginawa.linux-arm7.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm7.bz2.sha256) |
+| Linux   | armv8 | [kaginawa.linux-arm8.bz2](https://kaginawa.github.io/kaginawa.linux-arm8.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm8.bz2.sha256) |
+| MacOS   | amd64 | [kaginawa.macos-x64.bz2](https://kaginawa.github.io/kaginawa.macos-x64.bz2)   | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.macos-x64.bz2.sha256)  |
+| MacOS   | arm64 | T.B.A.                                                                        | bzip2  | T.B.A.                                                              |
+| Windows | amd64 | [kaginawa.exe.zip](https://kaginawa.github.io/kaginawa.exe.zip)               | zip    | [sha256](https://kaginawa.github.io/kaginawa.exe.zip.sha256)        |
+
+Note for ARM-based platforms:
+
+| Arch  | Description    | Raspberry Pi Models                      |
+| ----- | -------------- | ---------------------------------------- |
+| armv6 | 32bit ARMv6    | A, B, 1A+, 1B+, Zero, CM1                |
+| armv7 | 32bit ARMv7/v8 | 2B or higher w/32bit OS                  |
+| armv8 | 64bit ARMv8    | 2v1.2, 2Bv1.2, 3A/B or higher w/64bit OS |
+
 ## System Requirements
 
 - [Kaginawa server](https://github.com/kaginawa/kaginawa-server) (data collection)
-- SSH Server (ssh sockets)
+- OpenSSH Server (ssh sockets)
 
 ## Configuration
 
