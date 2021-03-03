@@ -5,7 +5,7 @@ import (
 	"compress/gzip"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -239,7 +239,7 @@ func uploadReport(report []byte, proto string) error {
 		}
 		reader = r
 	}
-	body, err := ioutil.ReadAll(reader)
+	body, err := io.ReadAll(reader)
 	if err != nil {
 		return fmt.Errorf("faield to read response: %w", err)
 	}

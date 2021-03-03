@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"runtime"
 )
@@ -55,7 +54,7 @@ func loadConfig(path string) error {
 	if _, err := os.Stat(path); err != nil {
 		return fmt.Errorf("configuration file not found: %s", path)
 	}
-	data, err := ioutil.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("failed to load %s: %w", path, err)
 	}

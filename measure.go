@@ -3,7 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strconv"
 	"time"
@@ -16,7 +16,7 @@ func measureRoundTripTimeMills() (int64, error) {
 		return -1, err
 	}
 	defer safeClose(resp.Body, "measure body")
-	if _, err := ioutil.ReadAll(resp.Body); err != nil {
+	if _, err := io.ReadAll(resp.Body); err != nil {
 		return -1, err
 	}
 	elapsed := time.Since(begin).Milliseconds()
@@ -33,7 +33,7 @@ func measureThroughput(kb int) (int64, int64, error) {
 		return -1, -1, err
 	}
 	defer safeClose(dr.Body, "measure body")
-	if _, err := ioutil.ReadAll(dr.Body); err != nil {
+	if _, err := io.ReadAll(dr.Body); err != nil {
 		return -1, -1, err
 	}
 	downloadSec := time.Since(downloadBegin).Seconds()
@@ -47,7 +47,7 @@ func measureThroughput(kb int) (int64, int64, error) {
 		return -1, -1, err
 	}
 	defer safeClose(ur.Body, "measure body")
-	if _, err := ioutil.ReadAll(ur.Body); err != nil {
+	if _, err := io.ReadAll(ur.Body); err != nil {
 		return -1, -1, err
 	}
 	uploadSec := time.Since(uploadBegin).Seconds()
