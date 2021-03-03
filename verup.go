@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -34,7 +33,7 @@ func checkAndUpdate() (finished bool) {
 	if newest {
 		return false
 	}
-	log.Printf("starging version up process: %s -> %s", ver, newVer)
+	log.Printf("starting version up process: %s -> %s", ver, newVer)
 	url := binaryURL()
 	if len(url) == 0 {
 		log.Printf("automatic update disabled due to unsupported machine: %s %s", runtime.GOOS, runtime.GOARCH)
@@ -78,7 +77,7 @@ func latest() (string, bool) {
 		return ver, true // may offline
 	}
 	defer safeClose(resp.Body, "update check body")
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return ver, true
 	}
@@ -124,7 +123,7 @@ func download(url string) ([]byte, error) {
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("%s HTTP %s", url, resp.Status)
 	}
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
@@ -146,7 +145,7 @@ func validate(content []byte, checksum []byte) bool {
 
 func extract(content []byte) (string, error) {
 	// Create temp file
-	tempFile, err := ioutil.TempFile("", "kgnw")
+	tempFile, err := os.CreateTemp("", "kgnw")
 	if err != nil {
 		return "", err
 	}
