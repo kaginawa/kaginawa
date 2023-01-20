@@ -1,5 +1,7 @@
 module github.com/kaginawa/kaginawa
 
-go 1.13
+go 1.19
 
-require golang.org/x/crypto v0.0.0-20200820211705-5c72a883971a
+require golang.org/x/crypto v0.5.0
+
+require golang.org/x/sys v0.4.0 // indirect
