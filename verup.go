@@ -96,6 +96,9 @@ func binaryURL() string {
 	}
 	if runtime.GOOS == "linux" && runtime.GOARCH == "arm" {
 		if machine, err := exec.Command("uname", "-m").Output(); err != nil {
+			if strings.HasPrefix(string(machine), "armv5") {
+				return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm5.bz2", 1)
+			}
 			if strings.HasPrefix(string(machine), "armv6") {
 				return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm6.bz2", 1)
 			}
@@ -105,8 +108,14 @@ func binaryURL() string {
 	if runtime.GOOS == "linux" && runtime.GOARCH == "arm64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-arm8.bz2", 1)
 	}
+	if runtime.GOOS == "linux" && runtime.GOARCH == "riscv64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.linux-riscv64.bz2", 1)
+	}
 	if runtime.GOOS == "darwin" && runtime.GOARCH == "amd64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos-x64.bz2", 1)
+	}
+	if runtime.GOOS == "darwin" && runtime.GOARCH == "arm64" {
+		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.macos-arm64.bz2", 1)
 	}
 	if runtime.GOOS == "windows" && runtime.GOARCH == "amd64" {
 		return strings.Replace(config.UpdateCheckURL, "LATEST", "kaginawa.exe.zip", 1)
