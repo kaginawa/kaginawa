@@ -19,15 +19,17 @@ Kaginawa (Japanese: 鉤縄) is a remote maintenance and data collection software
 
 ## Download
 
-| OS      | Arch  | Download Link                                                                 | Format | Checksum                                                            |
-| ------- | ----- | ----------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------- |
-| Linux   | amd64 | [kaginawa.linux-x64.bz2](https://kaginawa.github.io/kaginawa.linux-x64.bz2)   | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-x64.bz2.sha256)  |
-| Linux   | armv6 | [kaginawa.linux-arm6.bz2](https://kaginawa.github.io/kaginawa.linux-arm6.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm6.bz2.sha256) |
-| Linux   | armv7 | [kaginawa.linux-arm7.bz2](https://kaginawa.github.io/kaginawa.linux-arm7.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm7.bz2.sha256) |
-| Linux   | armv8 | [kaginawa.linux-arm8.bz2](https://kaginawa.github.io/kaginawa.linux-arm8.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm8.bz2.sha256) |
-| MacOS   | amd64 | [kaginawa.macos-x64.bz2](https://kaginawa.github.io/kaginawa.macos-x64.bz2)   | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.macos-x64.bz2.sha256)  |
-| MacOS   | arm64 | T.B.A.                                                                        | bzip2  | T.B.A.                                                              |
-| Windows | amd64 | [kaginawa.exe.zip](https://kaginawa.github.io/kaginawa.exe.zip)               | zip    | [sha256](https://kaginawa.github.io/kaginawa.exe.zip.sha256)        |
+| OS      | Arch       | Download Link                                                                       | Format | Checksum                                                               |
+|---------|------------|-------------------------------------------------------------------------------------|--------|------------------------------------------------------------------------|
+| Linux   | amd64      | [kaginawa.linux-x64.bz2](https://kaginawa.github.io/kaginawa.linux-x64.bz2)         | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-x64.bz2.sha256)     |
+| Linux   | armv5      | [kaginawa.linux-arm5.bz2](https://kaginawa.github.io/kaginawa.linux-arm5.bz2)       | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm5.bz2.sha256)    |
+| Linux   | armv6      | [kaginawa.linux-arm6.bz2](https://kaginawa.github.io/kaginawa.linux-arm6.bz2)       | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm6.bz2.sha256)    |
+| Linux   | armv7      | [kaginawa.linux-arm7.bz2](https://kaginawa.github.io/kaginawa.linux-arm7.bz2)       | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm7.bz2.sha256)    |
+| Linux   | armv8 (64) | [kaginawa.linux-arm8.bz2](https://kaginawa.github.io/kaginawa.linux-arm8.bz2)       | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-arm8.bz2.sha256)    |
+| Linux   | riscv64    | [kaginawa.linux-riscv64.bz2](https://kaginawa.github.io/kaginawa.linux-riscv64.bz2) | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.linux-riscv64.bz2.sha256) |
+| MacOS   | amd64      | [kaginawa.macos-x64.bz2](https://kaginawa.github.io/kaginawa.macos-x64.bz2)         | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.macos-x64.bz2.sha256)     |
+| MacOS   | arm64      | [kaginawa.macos-arm64.bz2](https://kaginawa.github.io/kaginawa.macos-arm64.bz2)     | bzip2  | [sha256](https://kaginawa.github.io/kaginawa.macos-arm64.bz2.sha256)   |
+| Windows | amd64      | [kaginawa.exe.zip](https://kaginawa.github.io/kaginawa.exe.zip)                     | zip    | [sha256](https://kaginawa.github.io/kaginawa.exe.zip.sha256)           |
 
 Note for ARM-based platforms:
 
